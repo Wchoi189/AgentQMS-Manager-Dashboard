@@ -1,3 +1,14 @@
+---
+title: "AgentQMS Frontend Architecture Guidelines"
+type: architecture
+status: complete
+created: 2025-12-08 14:30 (KST)
+updated: 2025-12-08 14:30 (KST)
+phase: 2
+priority: high
+tags: [architecture, frontend, react, patterns, separation-of-concerns]
+---
+
 # AgentQMS Frontend Architecture Guidelines
 
 ## 1. Core Philosophy: Separation of Concerns

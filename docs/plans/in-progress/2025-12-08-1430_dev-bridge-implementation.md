@@ -1,4 +1,15 @@
 
+---
+title: "Implementation Plan: Python Bridge Backend"
+type: development
+status: in-progress
+created: 2025-12-08 14:30 (KST)
+updated: 2025-12-08 14:30 (KST)
+phase: 2
+priority: critical
+tags: [development, backend, fastapi, bridge-server, implementation]
+---
+
 # Implementation Plan: Python Bridge (Backend)
 
 **Target:** Connect React Dashboard to Local File System.

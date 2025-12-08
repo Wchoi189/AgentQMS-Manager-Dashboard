@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, CheckCircle, Loader2, ArrowRight, Terminal, Wand2, Play } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle, Loader2, ArrowRight, Terminal, Wand2 } from 'lucide-react';
 import { auditDocumentation } from '../services/aiService';
 import { AuditResponse, AuditToolConfig } from '../types';
 

@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { LayoutDashboard, FilePlus, ShieldAlert, Network, Menu, X, Settings as SettingsIcon, Cable, Telescope } from 'lucide-react';
+import { LayoutDashboard, FilePlus, ShieldAlert, Network, Menu, X, Settings as SettingsIcon, Cable, Telescope, BookOpen, Link2 } from 'lucide-react';
 import ArtifactGenerator from './components/ArtifactGenerator';
 import FrameworkAuditor from './components/FrameworkAuditor';
 import StrategyDashboard from './components/StrategyDashboard';
@@ -7,6 +8,8 @@ import IntegrationHub from './components/IntegrationHub';
 import ContextExplorer from './components/ContextExplorer';
 import Settings from './components/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
+import { Librarian } from './components/Librarian';
+import { ReferenceManager } from './components/ReferenceManager';
 import { AppView } from './types';
 
 const App: React.FC = () => {
@@ -27,6 +30,10 @@ const App: React.FC = () => {
         return <IntegrationHub />;
       case AppView.CONTEXT_EXPLORER:
         return <ContextExplorer />;
+      case AppView.LIBRARIAN:
+        return <Librarian />;
+      case AppView.REFERENCE_MANAGER:
+        return <ReferenceManager />;
       case AppView.SETTINGS:
         return <Settings />;
       default:
@@ -71,13 +78,23 @@ const App: React.FC = () => {
           </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <NavItem view={AppView.DASHBOARD} icon={LayoutDashboard} label="Dashboard" />
           <NavItem view={AppView.INTEGRATION_HUB} icon={Cable} label="Integration" />
-          <NavItem view={AppView.CONTEXT_EXPLORER} icon={Telescope} label="Explorer" />
-          <NavItem view={AppView.ARTIFACT_GENERATOR} icon={FilePlus} label="Generator" />
-          <NavItem view={AppView.FRAMEWORK_AUDITOR} icon={ShieldAlert} label="Auditor" />
-          <NavItem view={AppView.STRATEGY_MAP} icon={Network} label="Strategy" />
+          
+          <div className="py-2">
+             <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Core Tools</div>
+             <NavItem view={AppView.ARTIFACT_GENERATOR} icon={FilePlus} label="Generator" />
+             <NavItem view={AppView.FRAMEWORK_AUDITOR} icon={ShieldAlert} label="Auditor" />
+          </div>
+
+          <div className="py-2">
+             <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Registry</div>
+             <NavItem view={AppView.LIBRARIAN} icon={BookOpen} label="Librarian" />
+             <NavItem view={AppView.REFERENCE_MANAGER} icon={Link2} label="Ref Manager" />
+             <NavItem view={AppView.CONTEXT_EXPLORER} icon={Telescope} label="Explorer" />
+          </div>
+          
         </nav>
 
         <div className="p-4 border-t border-slate-800">
@@ -107,6 +124,8 @@ const App: React.FC = () => {
                   {currentView === AppView.STRATEGY_MAP && "Strategic Architecture"}
                   {currentView === AppView.INTEGRATION_HUB && "Integration Hub"}
                   {currentView === AppView.CONTEXT_EXPLORER && "Context & Traceability"}
+                  {currentView === AppView.LIBRARIAN && "The Librarian"}
+                  {currentView === AppView.REFERENCE_MANAGER && "Reference Migration"}
                   {currentView === AppView.SETTINGS && "System Settings"}
                </h1>
             </div>

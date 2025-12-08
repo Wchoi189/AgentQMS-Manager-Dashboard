@@ -25,7 +25,6 @@ const ArtifactGenerator: React.FC = () => {
     const day = String(now.getDate()).padStart(2, '0');
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    // Using centralized configuration for timezone
     return `${year}-${month}-${day} ${hours}:${minutes} (${APP_CONFIG.DEFAULTS.TIMEZONE})`;
   };
 

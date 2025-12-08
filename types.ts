@@ -6,7 +6,9 @@ export enum AppView {
   STRATEGY_MAP = 'STRATEGY_MAP',
   INTEGRATION_HUB = 'INTEGRATION_HUB',
   CONTEXT_EXPLORER = 'CONTEXT_EXPLORER',
-  SETTINGS = 'SETTINGS'
+  SETTINGS = 'SETTINGS',
+  LIBRARIAN = 'LIBRARIAN',
+  REFERENCE_MANAGER = 'REFERENCE_MANAGER'
 }
 
 export enum AIProvider {
@@ -77,4 +79,37 @@ export interface AuditToolConfig {
   command: string;
   scriptPath: string;
   args: { name: string; flag: string; type: 'file' | 'text' | 'select'; options?: string[] }[];
+}
+
+// Phase 2: Reference System Types
+export interface DocEntry {
+  path: string;
+  udi: string;
+  title: string;
+  lastModified: string;
+  contentSnippet: string;
+}
+
+export interface LinkAnalysis {
+  original: string;
+  type: 'FILE_PATH' | 'UDI' | 'EXTERNAL';
+  resolved?: string; // The path if it's a UDI, or UDI if it's a path
+  isValid: boolean;
+  suggestion?: string;
+  contextAnalysis?: string; // AI analysis
+}
+
+export interface NextStep {
+  title: string;
+  description: string;
+  priority: 'High' | 'Medium' | 'Low';
+  estimatedTime: string;
+}
+
+export interface SessionAnalysis {
+  summary: string;
+  keyContextPoints: string[];
+  blockers: string[];
+  sentiment: string;
+  suggestedNextSteps: NextStep[];
 }

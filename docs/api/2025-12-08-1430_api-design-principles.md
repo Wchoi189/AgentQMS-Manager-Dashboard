@@ -1,8 +1,19 @@
+---
+title: "AgentQMS API Design Principles"
+type: api
+status: complete
+created: 2025-12-08 14:30 (KST)
+updated: 2025-12-08 14:30 (KST)
+phase: 1
+priority: medium
+tags: [api, design-principles, rest, documentation]
+---
+
 <div align="center">
 
 # AgentQMS Internal API
 
-**Created:** 2024-05-22 15:30 (KST) | **Updated:** 2024-05-22 15:30 (KST)
+**Created:** 2025-12-08 14:30 (KST) | **Updated:** 2025-12-08 14:30 (KST)
 
 [**README**](../README.md) • [**Roadmap**](./agentqms-roadmap.md) • [**Architecture**](./agentqms-mermaid.md) • [**Features**](./agentqms-features.md) • [**API**](./agentqms-api.md)
 
@@ -14,7 +25,7 @@
 
 ### `generateContent(prompt, config)`
 *   **Purpose**: Main gateway to AI providers.
-*   **Args**: 
+*   **Args**:
     *   `prompt` (string): Input text.
     *   `config` (obj): `{ systemInstruction, jsonMode }`.
 *   **Returns**: `Promise<string>` (Raw text or JSON string).
@@ -27,7 +38,7 @@
 
 ### `validate_frontmatter.py`
 *   **Usage**: `python validate_frontmatter.py --file <path>`
-*   **Exit Codes**: 
+*   **Exit Codes**:
     *   `0`: Valid.
     *   `1`: Missing Fields.
     *   `2`: Invalid Format (Timestamp/Branch).

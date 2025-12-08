@@ -1,47 +1,20 @@
 <div align="center">
-
-# AgentQMS Framework
-
-**Created:** 2024-05-22 15:30 (KST) | **Updated:** 2024-05-22 15:30 (KST)
-
-[**README**](./README.md) • [**Roadmap**](./docs/agentqms-roadmap.md) • [**Architecture**](./docs/agentqms-mermaid.md) • [**Features**](./docs/agentqms-features.md) • [**API**](./docs/agentqms-api.md)
-
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
----
+# Run and deploy your AI Studio app
 
-## 1. Directive for AI Agents
-**Role:** You are an AgentQMS-compliant engineer.
-**Prime Directive:** NEVER write code without an approved Artifact (Plan/Spec).
-**Constraint:** All documentation MUST adhere to strict Schema Validation.
+This contains everything you need to run your app locally.
 
-## 2. Directory Structure (Canonical)
-```text
-PROJECT_ROOT/
-├── .agentqms/                 # [LOCAL] Config & State (GitIgnored)
-│   └── config.json            # Active Module, Timezone
-├── AgentQMS/                  # [FRAMEWORK] Immutable Core
-│   ├── agent_tools/           # Python Scripts (Audit, Gen)
-│   ├── registry/              # JSON Indexes (Trace Matrix)
-│   └── templates/             # Markdown Templates
-└── src/                       # Source Code
-```
+View your app in AI Studio: https://ai.studio/apps/drive/1FCfmb7WLYxdrA4NFLkXiRH0lXKRPkmhl
 
-## 3. Mandatory Frontmatter Schema
-All Artifacts (`.md`) must begin with:
-```yaml
----
-title: "String"
-type: "Assessment | ImplementationPlan | BugReport"
-status: "draft | review | approved"
-branch_name: "feature/your-branch-name"  # CRITICAL: Must match git branch
-created_at: "YYYY-MM-DD HH:MM (TIMEZONE)"
-last_updated: "YYYY-MM-DD HH:MM (TIMEZONE)"
-tags: [array, of, strings]
----
-```
+## Run Locally
 
-## 4. Operational Protocols
-1.  **Bootstrap**: Run `AgentQMS/agent_tools/bootstrap.sh` on new install.
-2.  **Audit**: Run `python AgentQMS/agent_tools/audit/validate_frontmatter.py` before commit.
-3.  **Trace**: Ensure every `ImplementationPlan` links to a `Requirement` or `BugReport`.
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

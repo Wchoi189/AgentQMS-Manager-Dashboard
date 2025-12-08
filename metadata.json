@@ -1,5 +1,5 @@
 {
-  "name": "AgentQMS Manager Dashboard v.0.0.1",
-  "description": "A comprehensive dashboard for managing AgentQMS documentation artifacts, enforcing schema rules (Branch Name, Timestamps), and auditing framework integrity using Gemini AI.",
+  "name": "AgentQMS Manager Dashboard",
+  "description": "A documentation quality framework dashboard focusing on UDI (Unique Documentation Identifier) management and reference system migration.",
   "requestFramePermissions": []
 }

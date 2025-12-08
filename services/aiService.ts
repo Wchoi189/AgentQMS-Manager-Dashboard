@@ -159,3 +159,22 @@ export const generateAgentSystemPrompt = async (projectContext: string): Promise
     return "Error generating protocol. Please check your API settings.";
   }
 };
+
+export const analyzeLinkRelevance = async (linkText: string, targetContent: string): Promise<string> => {
+  try {
+    const prompt = `
+      Link Text: "${linkText}"
+      Target Document Content Snippet: "${targetContent}"
+      
+      Does the link text accurately reflect the content of the target document? 
+      Provide a 1 sentence verification. If it's vague, suggest a better link text.
+    `;
+
+    return await generateContent(prompt, {
+      systemInstruction: "You are a documentation quality auditor verifying hyperlinks."
+    });
+  } catch (error) {
+    console.error("Analysis Error:", error);
+    return "AI Analysis unavailable.";
+  }
+};

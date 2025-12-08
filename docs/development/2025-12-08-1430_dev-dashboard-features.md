@@ -1,8 +1,19 @@
+---
+title: "AgentQMS Dashboard Features"
+type: development
+status: complete
+created: 2025-12-08 14:30 (KST)
+updated: 2025-12-08 14:30 (KST)
+phase: 1
+priority: medium
+tags: [development, features, dashboard, capabilities]
+---
+
 <div align="center">
 
 # AgentQMS Features
 
-**Created:** 2024-05-22 15:30 (KST) | **Updated:** 2024-05-22 15:30 (KST)
+**Created:** 2025-12-08 14:30 (KST) | **Updated:** 2025-12-08 14:30 (KST)
 
 [**README**](../README.md) • [**Roadmap**](./agentqms-roadmap.md) • [**Architecture**](./agentqms-mermaid.md) • [**Features**](./agentqms-features.md) • [**API**](./agentqms-api.md)
 

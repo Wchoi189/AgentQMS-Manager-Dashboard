@@ -1,4 +1,15 @@
 
+---
+title: "AgentQMS Data Contracts & API Specifications"
+type: api
+status: draft
+created: 2025-12-08 14:30 (KST)
+updated: 2025-12-08 14:30 (KST)
+phase: 2
+priority: high
+tags: [api, contracts, fastapi, endpoints, json-schema]
+---
+
 # AgentQMS Data Contracts & API Specifications
 
 **Version:** 1.0.0
