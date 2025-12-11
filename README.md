@@ -24,30 +24,151 @@ AgentQMS Dashboard provides a modern web interface for managing documentation ar
 
 ## App Demo Gallery
 
-These screens show the dashboard overview, context explorer, artifact generator, and integration hub flows in a single place. Use them to quickly convey core capabilities and UI flow without spinning up the app. Swap in updated captures anytime by replacing the image files below.
+Click any screenshot to view in full size. These screens show the dashboard overview, context explorer, artifact generator, and integration hub flows. Swap in updated captures anytime by replacing the image files below.
 
-<table>
-  <tr>
-    <td width="50%" align="center">
-      <strong>Overview</strong><br />
-      <img src="docs/assets/images/dashboard-overview-tab-fullscreen_v2.5.0-1.png" alt="Dashboard overview tab" width="100%" />
-    </td>
-    <td width="50%" align="center">
-      <strong>Context Explorer</strong><br />
-      <img src="docs/assets/images/dashboard-explorer-tab-context-traceability-fulscreen_v2.5.0.png" alt="Context explorer tab with traceability" width="100%" />
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <strong>Artifact Generator</strong><br />
-      <img src="docs/assets/images/dashboard-generator-tab-artifact-generator-fullscreen-v2.5.0.png" alt="Artifact generator tab" width="100%" />
-    </td>
-    <td width="50%" align="center">
-      <strong>Integration Hub</strong><br />
-      <img src="docs/assets/images/dashboard-integration-hub-tab-fullscreen_v2.5.0.png" alt="Integration hub tab" width="100%" />
-    </td>
-  </tr>
-</table>
+<style>
+  .screenshot-row {
+    margin: 20px 0;
+    text-align: center;
+  }
+  .screenshot-container {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+  }
+  .screenshot-img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .screenshot-img:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
+  }
+  .modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh;
+    padding-top: 2vh;
+  }
+  .modal-content {
+    animation: zoomIn 0.3s;
+  }
+  @keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .close-modal {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1001;
+  }
+  .close-modal:hover {
+    color: #bbb;
+  }
+  .screenshot-title {
+    font-weight: bold;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+</style>
+
+<div class="screenshot-row">
+  <div class="screenshot-title">📊 Dashboard Overview</div>
+  <div class="screenshot-container">
+    <img class="screenshot-img" id="img1" src="docs/assets/images/dashboard-overview-tab-fullscreen_v2.5.0-1.png" alt="Dashboard overview tab" width="100%" />
+  </div>
+</div>
+
+<div id="modal1" class="modal">
+  <span class="close-modal" onclick="document.getElementById('modal1').style.display='none'">&times;</span>
+  <img class="modal-content" src="docs/assets/images/dashboard-overview-tab-fullscreen_v2.5.0-1.png" alt="Dashboard overview tab" />
+</div>
+
+<div class="screenshot-row">
+  <div class="screenshot-title">🌐 Context Explorer</div>
+  <div class="screenshot-container">
+    <img class="screenshot-img" id="img2" src="docs/assets/images/dashboard-explorer-tab-context-traceability-fulscreen_v2.5.0.png" alt="Context explorer tab with traceability" width="100%" />
+  </div>
+</div>
+
+<div id="modal2" class="modal">
+  <span class="close-modal" onclick="document.getElementById('modal2').style.display='none'">&times;</span>
+  <img class="modal-content" src="docs/assets/images/dashboard-explorer-tab-context-traceability-fulscreen_v2.5.0.png" alt="Context explorer tab with traceability" />
+</div>
+
+<div class="screenshot-row">
+  <div class="screenshot-title">🎯 Artifact Generator</div>
+  <div class="screenshot-container">
+    <img class="screenshot-img" id="img3" src="docs/assets/images/dashboard-generator-tab-artifact-generator-fullscreen-v2.5.0.png" alt="Artifact generator tab" width="100%" />
+  </div>
+</div>
+
+<div id="modal3" class="modal">
+  <span class="close-modal" onclick="document.getElementById('modal3').style.display='none'">&times;</span>
+  <img class="modal-content" src="docs/assets/images/dashboard-generator-tab-artifact-generator-fullscreen-v2.5.0.png" alt="Artifact generator tab" />
+</div>
+
+<div class="screenshot-row">
+  <div class="screenshot-title">🔗 Integration Hub</div>
+  <div class="screenshot-container">
+    <img class="screenshot-img" id="img4" src="docs/assets/images/dashboard-integration-hub-tab-fullscreen_v2.5.0.png" alt="Integration hub tab" width="100%" />
+  </div>
+</div>
+
+<div id="modal4" class="modal">
+  <span class="close-modal" onclick="document.getElementById('modal4').style.display='none'">&times;</span>
+  <img class="modal-content" src="docs/assets/images/dashboard-integration-hub-tab-fullscreen_v2.5.0.png" alt="Integration hub tab" />
+</div>
+
+<script>
+  // Click to open modal functionality
+  document.getElementById('img1').onclick = function() { document.getElementById('modal1').style.display = 'block'; }
+  document.getElementById('img2').onclick = function() { document.getElementById('modal2').style.display = 'block'; }
+  document.getElementById('img3').onclick = function() { document.getElementById('modal3').style.display = 'block'; }
+  document.getElementById('img4').onclick = function() { document.getElementById('modal4').style.display = 'block'; }
+  
+  // Click outside modal to close
+  window.onclick = function(event) {
+    let modals = document.querySelectorAll('.modal');
+    modals.forEach(function(modal) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    });
+  }
+  
+  // ESC key to close modal
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      let modals = document.querySelectorAll('.modal');
+      modals.forEach(function(modal) {
+        modal.style.display = 'none';
+      });
+    }
+  });
+</script>
 
 
 ## Quick Start
