@@ -99,19 +99,28 @@ export const generateContent = async (prompt: string, config: AIRequestConfig = 
 
 export const auditDocumentation = async (content: string, type: string): Promise<AuditResponse> => {
   const systemInstruction = `
-    You are AgentQMS, a strict Documentation Quality Management System auditor.
-    Your goal is to audit the provided documentation content (Markdown/YAML) against strict framework rules.
-    Framework Rules:
-    1. Metadata Compliance: Must have valid YAML frontmatter.
-    2. Branch Name Integration: Frontmatter MUST include a 'branch_name' field.
-    3. Timestamp Enforcement: Dates must use the format 'YYYY-MM-DD HH:MM (TIMEZONE)' (e.g., 2025-11-21 02:31 (${APP_CONFIG.DEFAULTS.TIMEZONE})).
-    4. Structure: Must follow logical header hierarchy.
-    5. Clarity: Language must be technical but clear.
+    You are AgentQMS, a Documentation Organization Efficiency Auditor.
+    Your goal is to assess the organizational efficiency, consistency, and maintainability of documentation.
     
-    Return a structured JSON assessment with keys: score (number), issues (string array), recommendations (string array), rawAnalysis (string).
+    Focus your assessment on:
+    1. Organizational Efficiency: How well is the documentation structured? Are architectural documents separated from session notes?
+    2. Consistency: Are naming conventions followed consistently? Is the structure predictable?
+    3. Entry Points: Can users easily find what they need? Is navigation clear?
+    4. Maintainability: Are there pain points that make maintenance difficult? Is there clutter?
+    5. Opportunities: What specific improvements would enhance organization?
+    
+    DO NOT focus on frontmatter validation (that's handled by tools). Instead, assess:
+    - How consistently conventions are followed
+    - Whether architectural documents are separated from session notes
+    - Clarity of entry points and navigation
+    - Pain points in maintainability
+    - Opportunities for organizational improvements
+    
+    Return a structured JSON assessment with keys: score (number 0-100), issues (string array), recommendations (string array), rawAnalysis (string).
+    Score should reflect organizational efficiency (higher = better organized).
   `;
 
-  const prompt = `Audit this ${type} artifact:\n\n${content}`;
+  const prompt = `Assess the organizational efficiency of this ${type} documentation:\n\n${content}\n\nProvide an organizational assessment focusing on structure, consistency, maintainability, and opportunities for improvement.`;
   
   try {
     const jsonStr = await generateContent(prompt, { 
@@ -129,10 +138,46 @@ export const auditDocumentation = async (content: string, type: string): Promise
   }
 };
 
-export const generateArchitectureAdvice = async (query: string): Promise<string> => {
+interface DirectoryTree {
+  name: string;
+  path: string;
+  type: string;
+  file_count: number;
+  children: DirectoryTree[];
+}
+
+export const generateArchitectureAdvice = async (
+  topic: string, 
+  directoryStructure?: DirectoryTree
+): Promise<string> => {
   try {
-    return await generateContent(query, {
-      systemInstruction: "You are a Senior System Architect specializing in Documentation Frameworks, Version Control, and Indexing Systems. Provide concise, strategic advice."
+    let prompt = `Based on the actual directory structure shown below, provide recommendations for improving documentation organization for: ${topic}.\n\n`;
+    
+    if (directoryStructure) {
+      // Format directory tree as text
+      const formatTree = (node: DirectoryTree, indent: string = ""): string => {
+        let result = `${indent}${node.name}/ (${node.file_count} files)\n`;
+        for (const child of node.children) {
+          result += formatTree(child, indent + "  ");
+        }
+        return result;
+      };
+      
+      prompt += `Current Directory Structure:\n${formatTree(directoryStructure)}\n\n`;
+      prompt += `Focus your advice on:\n`;
+      prompt += `- How to improve documentation organization and maintainability\n`;
+      prompt += `- Separating architectural documents from session notes\n`;
+      prompt += `- Consistency in naming conventions and folder structure\n`;
+      prompt += `- Entry points and navigation clarity\n`;
+      prompt += `- Opportunities for reducing clutter\n`;
+      prompt += `- Specific recommendations based on the actual structure shown above\n\n`;
+      prompt += `Provide 3-5 specific, actionable recommendations.`;
+    } else {
+      prompt += `Provide 3 strategic bullet points for implementing ${topic} in a documentation quality management framework (AgentQMS). Focus on documentation organization, not generic scalability.`;
+    }
+    
+    return await generateContent(prompt, {
+      systemInstruction: "You are a Senior Documentation Architect specializing in organizing technical documentation, maintaining consistency, and improving maintainability. Provide specific, actionable advice based on actual directory structures."
     });
   } catch (error) {
     return "Unable to generate advice. Please check your API settings.";

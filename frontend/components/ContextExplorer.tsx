@@ -1,25 +1,47 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Network, Grid, Box, FileText, Layers, ZoomIn, Info } from 'lucide-react';
 import { ContextNode, ContextBundle } from '../types';
-
-// Mock Data representing the "Registry" or "Tracking DB"
-const MOCK_BUNDLE: ContextBundle = {
-  name: "OCR-2 Feature Context",
-  nodes: [
-    { id: 'root', label: 'OCR-2 Project', type: 'root', status: 'active', connections: ['mod1', 'mod2'] },
-    { id: 'mod1', label: 'Preprocessing Module', type: 'module', status: 'active', connections: ['p1', 'a1'] },
-    { id: 'mod2', label: 'Inference Engine', type: 'module', status: 'active', connections: ['p2'] },
-    { id: 'p1', label: 'Image Norm Plan', type: 'plan', status: 'active', connections: ['r1'] },
-    { id: 'a1', label: 'Norm Audit', type: 'audit', status: 'active', connections: [] },
-    { id: 'p2', label: 'Model Load Plan', type: 'plan', status: 'pending', connections: [] },
-    { id: 'r1', label: 'Bug Report #402', type: 'report', status: 'archived', connections: [] },
-  ]
-};
+import { bridgeService } from '../services/bridgeService';
 
 const ContextExplorer: React.FC = () => {
   const [viewMode, setViewMode] = useState<'graph' | 'matrix'>('graph');
   const [selectedNode, setSelectedNode] = useState<ContextNode | null>(null);
+  const [artifacts, setArtifacts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadArtifacts = async () => {
+      try {
+        const response = await bridgeService.listArtifacts({ limit: 100 });
+        setArtifacts(response.items || []);
+      } catch (error) {
+        console.error('Failed to load artifacts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadArtifacts();
+  }, []);
+
+  // Convert artifacts to context nodes
+  const contextNodes: ContextNode[] = artifacts.map((artifact, idx) => ({
+    id: artifact.id || `art${idx}`,
+    label: artifact.title || 'Untitled',
+    type: artifact.type === 'implementation_plan' ? 'plan' : 
+          artifact.type === 'bug_report' ? 'report' :
+          artifact.type === 'audit' ? 'audit' : 'module',
+    status: artifact.status || 'draft',
+    connections: [] // TODO: Extract relationships from frontmatter
+  }));
+
+  const contextBundle: ContextBundle = {
+    name: "AgentQMS Artifacts",
+    nodes: [
+      { id: 'root', label: 'AgentQMS Dashboard', type: 'root', status: 'active', connections: contextNodes.map(n => n.id) },
+      ...contextNodes
+    ]
+  };
 
   // Simple Graph Rendering Calculation
   const renderGraph = () => {
@@ -43,7 +65,7 @@ const ContextExplorer: React.FC = () => {
                 </marker>
             </defs>
             {/* Edges */}
-            {MOCK_BUNDLE.nodes.map(node => (
+            {contextBundle.nodes.map(node => (
                 node.connections.map(targetId => {
                     const start = positions[node.id];
                     const end = positions[targetId];
@@ -61,7 +83,7 @@ const ContextExplorer: React.FC = () => {
                 })
             ))}
             {/* Nodes */}
-            {MOCK_BUNDLE.nodes.map(node => {
+            {contextBundle.nodes.map(node => {
                 const pos = positions[node.id];
                 if (!pos) return null;
                 const isSelected = selectedNode?.id === node.id;
@@ -115,7 +137,9 @@ const ContextExplorer: React.FC = () => {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
-                    {MOCK_BUNDLE.nodes.filter(n => n.type !== 'root').map(node => (
+                    {loading ? (
+                        <tr><td colSpan={5} className="px-6 py-4 text-center text-slate-500">Loading artifacts...</td></tr>
+                    ) : contextBundle.nodes.filter(n => n.type !== 'root').map(node => (
                         <tr key={node.id} className="hover:bg-slate-700/50 transition-colors cursor-pointer" onClick={() => setSelectedNode(node)}>
                             <td className="px-6 py-4 font-medium text-white">{node.type === 'module' ? node.label : '-'}</td>
                             <td className="px-6 py-4 font-mono text-slate-400">{node.id}</td>

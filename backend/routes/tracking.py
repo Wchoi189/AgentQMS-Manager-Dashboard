@@ -5,8 +5,9 @@ import sys
 
 from fastapi import APIRouter, Query
 
-# Ensure AgentQMS is in path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+# Ensure AgentQMS is in path (backend/routes -> backend -> project root)
+workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.insert(0, workspace_root)
 
 router = APIRouter(prefix="/api/v1/tracking", tags=["tracking"])
 
@@ -47,8 +48,13 @@ async def get_tracking_status(kind: str = Query("all", description="Kind: plan, 
                 "error": str(e)
             }
     else:
-        # Original production code
+        # Real AgentQMS tracking (requires AgentQMS in path)
         try:
+            # Ensure workspace root is in path
+            workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+            if workspace_root not in sys.path:
+                sys.path.insert(0, workspace_root)
+            
             from AgentQMS.agent_tools.utilities.tracking.query import get_status
 
             status_text = get_status(kind)
@@ -57,10 +63,18 @@ async def get_tracking_status(kind: str = Query("all", description="Kind: plan, 
                 "status": status_text,
                 "success": True
             }
+        except ImportError as e:
+            # AgentQMS not available - return helpful error
+            return {
+                "kind": kind,
+                "status": f"AgentQMS tracking module not available: {str(e)}\n\nTo use real tracking, ensure:\n1. AgentQMS/ directory exists\n2. DEMO_MODE=false\n3. Tracking database is initialized",
+                "success": False,
+                "error": f"Import error: {str(e)}"
+            }
         except Exception as e:
             return {
                 "kind": kind,
-                "status": "",
+                "status": f"Error querying tracking database: {str(e)}",
                 "success": False,
                 "error": str(e)
             }

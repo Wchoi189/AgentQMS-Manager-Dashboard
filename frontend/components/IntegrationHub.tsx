@@ -5,6 +5,8 @@ import { generateAgentSystemPrompt } from '../services/aiService';
 import { bridgeService } from '../services/bridgeService';
 import { DBStatus } from '../types';
 
+const EXAMPLE_PROJECT_CONTEXT = "This is a Python OCR project using PyTorch. We are strict about code reviews and require all artifacts to follow AgentQMS schema with branch_name and timestamp fields.";
+
 const IntegrationHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bootstrap' | 'protocol' | 'database'>('bootstrap');
   const [projectContext, setProjectContext] = useState('');
@@ -26,6 +28,13 @@ const IntegrationHub: React.FC = () => {
   useEffect(() => {
     initializeDB();
   }, []);
+
+  useEffect(() => {
+    // Pre-populate example text when protocol tab is first opened
+    if (activeTab === 'protocol' && !projectContext) {
+      setProjectContext(EXAMPLE_PROJECT_CONTEXT);
+    }
+  }, [activeTab, projectContext]);
 
   const bootstrapScript = `#!/bin/bash
 # AgentQMS Bootstrap Script
@@ -91,6 +100,21 @@ echo "👉 Use '.agentqms/config.json' for local settings."
     setIsGenerating(true);
     try {
       const result = await generateAgentSystemPrompt(projectContext);
+      setGeneratedProtocol(result);
+    } catch (e) {
+      console.error(e);
+      alert("Generation failed. Check Settings to ensure API Key is valid.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleLoadExample = async () => {
+    setProjectContext(EXAMPLE_PROJECT_CONTEXT);
+    // Auto-generate after loading example
+    setIsGenerating(true);
+    try {
+      const result = await generateAgentSystemPrompt(EXAMPLE_PROJECT_CONTEXT);
       setGeneratedProtocol(result);
     } catch (e) {
       console.error(e);
@@ -202,6 +226,14 @@ echo "👉 Use '.agentqms/config.json' for local settings."
                   Describe your project context. We will generate a "System Prompt" you can paste into
                   Cursor, Windsurf, or ChatGPT to force them to use AgentQMS.
                 </p>
+                <div className="mb-2">
+                  <button
+                    onClick={handleLoadExample}
+                    className="text-xs text-purple-400 hover:text-purple-300 underline"
+                  >
+                    Load Example
+                  </button>
+                </div>
                 <textarea
                     className="w-full h-32 bg-slate-900 border border-slate-700 rounded p-3 text-slate-300 focus:border-purple-500 focus:outline-none resize-none mb-4"
                     placeholder="e.g., This is a Python OCR project using PyTorch. We are strict about code reviews..."
@@ -211,12 +243,15 @@ echo "👉 Use '.agentqms/config.json' for local settings."
                 <button
                     onClick={handleGenerateProtocol}
                     disabled={isGenerating || !projectContext}
-                    className={`w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
+                    className={`w-full py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 mb-2 ${
                         isGenerating ? 'bg-slate-700 text-slate-500' : 'bg-purple-600 hover:bg-purple-500 text-white'
                     }`}
                 >
                     {isGenerating ? 'Synthesizing Protocol...' : 'Generate System Prompt'}
                 </button>
+                <p className="text-xs text-slate-500 italic">
+                  💡 This is a demonstration. The example above shows how the feature works.
+                </p>
               </div>
 
               <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">

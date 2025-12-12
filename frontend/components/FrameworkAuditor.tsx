@@ -113,6 +113,11 @@ const FrameworkAuditor: React.FC = () => {
         <div>
             <h2 className="text-2xl font-bold text-white mb-2">Framework Auditor</h2>
             <p className="text-slate-400">Validate artifacts using AI Intelligence or Local Python Tools.</p>
+            {mode === 'ai' && (
+                <p className="text-xs text-slate-500 mt-1">
+                    AI Analysis evaluates documentation organization, consistency, and maintainability patterns. For frontmatter validation, use Tool Mode.
+                </p>
+            )}
         </div>
         <div className="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
             <button
@@ -183,10 +188,15 @@ const FrameworkAuditor: React.FC = () => {
             <div className="flex flex-col h-full">
             <textarea
                 className="flex-1 w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-slate-300 font-mono text-sm focus:outline-none focus:border-blue-500 resize-none mb-4"
-                placeholder="Paste document content here (including Frontmatter)..."
+                placeholder="Paste document content here to assess organizational efficiency, consistency, and maintainability..."
                 value={inputContent}
                 onChange={(e) => setInputContent(e.target.value)}
             />
+            <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                <p className="text-xs text-blue-300">
+                    💡 AI Analysis focuses on organizational efficiency: structure, consistency, maintainability, and opportunities for improvement. For frontmatter validation, use Tool Mode.
+                </p>
+            </div>
             <button
                 onClick={handleAiAudit}
                 disabled={isAuditing || !inputContent}
@@ -197,7 +207,7 @@ const FrameworkAuditor: React.FC = () => {
                 }`}
             >
                 {isAuditing ? <Loader2 className="animate-spin" /> : <ShieldCheck />}
-                {isAuditing ? 'Auditing...' : 'Run Compliance Audit'}
+                {isAuditing ? 'Analyzing Organization...' : 'Run Organizational Analysis'}
             </button>
             </div>
 
@@ -211,13 +221,13 @@ const FrameworkAuditor: React.FC = () => {
             ) : (
                 <div className="animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-white">Audit Report</h3>
+                    <h3 className="text-lg font-semibold text-white">Organizational Efficiency Report</h3>
                     <div className={`px-4 py-1.5 rounded-full font-bold text-sm ${
                         result.score >= 90 ? 'bg-green-500/20 text-green-400 border border-green-500/50' :
                         result.score >= 70 ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/50' :
                         'bg-red-500/20 text-red-400 border border-red-500/50'
                     }`}>
-                        Score: {result.score}/100
+                        Efficiency: {result.score}/100
                     </div>
                 </div>
 
@@ -228,7 +238,7 @@ const FrameworkAuditor: React.FC = () => {
 
                 <div className="mb-6">
                     <h4 className="text-sm font-semibold text-red-400 mb-3 flex items-center gap-2">
-                        <AlertTriangle size={16} /> Issues Detected
+                        <AlertTriangle size={16} /> Organizational Issues
                     </h4>
                     {result.issues.length === 0 ? (
                         <p className="text-slate-500 text-sm italic">No critical issues found.</p>

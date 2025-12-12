@@ -22,6 +22,71 @@ class ValidationResult(BaseModel):
     valid_files: int
     violations: list[dict[str, Any]]
 
+@router.get("/metrics")
+async def get_compliance_metrics():
+    """Get compliance metrics for Strategy Dashboard."""
+    import glob
+    import frontmatter
+    
+    # Use same artifacts root logic as artifacts route
+    _routes_dir = os.path.dirname(os.path.abspath(__file__))
+    _backend_dir = os.path.dirname(_routes_dir)
+    _project_root = os.path.dirname(_backend_dir)
+    DEMO_MODE_LOCAL = os.getenv("DEMO_MODE", "false").lower() == "true"
+    _artifacts_rel = "demo_data/artifacts" if DEMO_MODE_LOCAL else "docs/artifacts"
+    artifacts_root = os.path.join(_project_root, _artifacts_rel)
+    
+    try:
+        artifact_files = glob.glob(os.path.join(artifacts_root, "**", "*.md"), recursive=True)
+        total = len(artifact_files)
+        
+        if total == 0:
+            return {
+                "schema_compliance": 0,
+                "branch_integration": 0,
+                "timestamp_accuracy": 0,
+                "index_coverage": 0
+            }
+        
+        # Calculate metrics
+        valid_schema = 0
+        has_timestamps = 0
+        has_branch = 0
+        
+        for f in artifact_files:
+            try:
+                post = frontmatter.load(f)
+                metadata = post.metadata
+                
+                # Schema compliance: has required fields
+                if metadata.get("title") and metadata.get("type") and metadata.get("status"):
+                    valid_schema += 1
+                
+                # Timestamp accuracy: has date field
+                if metadata.get("date") or metadata.get("created"):
+                    has_timestamps += 1
+                
+                # Branch integration: has branch_name field
+                if metadata.get("branch_name"):
+                    has_branch += 1
+            except:
+                pass
+        
+        return {
+            "schema_compliance": int((valid_schema / total) * 100) if total > 0 else 0,
+            "branch_integration": int((has_branch / total) * 100) if total > 0 else 0,
+            "timestamp_accuracy": int((has_timestamps / total) * 100) if total > 0 else 0,
+            "index_coverage": int((total / max(total, 1)) * 100)  # Simplified
+        }
+    except Exception as e:
+        return {
+            "schema_compliance": 0,
+            "branch_integration": 0,
+            "timestamp_accuracy": 0,
+            "index_coverage": 0,
+            "error": str(e)
+        }
+
 @router.get("/validate", response_model=ValidationResult)
 async def validate_artifacts(
     target: str = Query("all", description="Target to validate: 'all', directory path, or file path")
@@ -55,10 +120,8 @@ async def validate_artifacts(
             raise HTTPException(status_code=500, detail=str(e))
     else:
         # Original production code
-        # Determine project root
-        # server.py is in apps/agentqms-dashboard/backend/
-        # project root is ../../../
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+        # Determine project root (backend/routes -> backend -> project root)
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         script_path = os.path.join(project_root, "AgentQMS/agent_tools/compliance/validate_artifacts.py")
 
         if not os.path.exists(script_path):

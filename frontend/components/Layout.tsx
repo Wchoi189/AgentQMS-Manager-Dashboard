@@ -11,7 +11,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange }) => {
   const navItems = [
     { id: AppView.DASHBOARD, label: 'Dashboard', icon: LayoutDashboard },
-    { id: AppView.LIBRARIAN, label: 'Librarian', icon: BookOpen },
+    { id: AppView.LIBRARIAN, label: 'Library', icon: BookOpen },
     { id: AppView.REFERENCE_MANAGER, label: 'Ref Manager', icon: FileText },
   ];
 
@@ -61,7 +61,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewCha
         <header className="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center shadow-sm z-10">
           <h1 className="text-2xl font-semibold text-gray-800">
             {currentView === AppView.DASHBOARD && 'System Overview'}
-            {currentView === AppView.LIBRARIAN && 'The Librarian'}
+            {currentView === AppView.LIBRARIAN && 'Library'}
             {currentView === AppView.REFERENCE_MANAGER && 'Reference System Migration'}
           </h1>
           <div className="flex items-center space-x-4">

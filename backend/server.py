@@ -8,8 +8,8 @@ from pydantic import BaseModel
 # Import local utils
 # Ensure current directory is in path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-# Add workspace root to path for AgentQMS imports
-workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+# Add workspace root to path for AgentQMS imports (backend -> project root)
+workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, workspace_root)
 
 import fs_utils

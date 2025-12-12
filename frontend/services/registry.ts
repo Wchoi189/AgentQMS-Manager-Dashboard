@@ -42,12 +42,23 @@ export const generateUDI = (): string => {
 };
 
 export const getSystemStats = async (): Promise<SystemStats> => {
+  try {
+    // Try to get real stats from backend
+    const response = await fetch('/api/v1/stats');
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (e) {
+    console.warn("Failed to fetch real stats, using fallback", e);
+  }
+  
+  // Fallback: calculate from registry
   const docs = await getRegistry();
   
   return {
     totalDocs: docs.length,
     docGrowth: 0,
-    referenceHealth: 100, // Placeholder for future logic
+    referenceHealth: 100,
     brokenLinks: 0,
     pendingMigrations: 0,
     distribution: [

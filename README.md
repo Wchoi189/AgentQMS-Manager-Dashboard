@@ -221,6 +221,14 @@ The boundary check may warn about legacy directories - this is expected. See `CO
 - **Development Plans**: [frontend/docs/plans/](frontend/docs/plans/)
 - **Console Issues**: [CONSOLE_WARNINGS_RESOLUTION.md](CONSOLE_WARNINGS_RESOLUTION.md)
 
+## AgentQMS Integration (current stance)
+
+- The AgentQMS framework and `.agentqms/` state are present but pruned. Artifact generation/validation tools are intended to live under `AgentQMS/agent_tools`, with runtime state in `.agentqms/`.
+- `.agentqms/state/architecture.yaml` now points artifacts to `docs/artifacts`. Plugin discovery paths point to this repo (see `.agentqms/state/plugins.yaml`).
+- Demo mode remains default (stubbed tool outputs). Real audits/validations will require wiring backend tool routes to `AgentQMS/interface` entrypoints and including only the lightweight/pruned AgentQMS bundle.
+- Known gap: auditor execution is incomplete; no real AgentQMS execution in the demo build yet.
+- Next steps (separate task): wire backend tool exec to AgentQMS when `DEMO_MODE=false`, and package a lightweight AgentQMS subset suitable for Google hosting.
+
 ## Implementation Status
 
 **Phase 1-3: ✅ COMPLETE** (as of 2025-12-11)

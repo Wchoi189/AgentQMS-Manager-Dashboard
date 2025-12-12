@@ -66,7 +66,7 @@ export const Librarian: React.FC = () => {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
           <BookOpen size={28} />
-          The Librarian
+          Library
         </h2>
         <p className="text-slate-400">Browse and manage artifacts in the repository</p>
       </div>

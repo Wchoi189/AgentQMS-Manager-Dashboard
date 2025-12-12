@@ -90,7 +90,7 @@ const App: React.FC = () => {
 
           <div className="py-2">
              <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Registry</div>
-             <NavItem view={AppView.LIBRARIAN} icon={BookOpen} label="Librarian" />
+             <NavItem view={AppView.LIBRARIAN} icon={BookOpen} label="Library" />
              <NavItem view={AppView.REFERENCE_MANAGER} icon={Link2} label="Ref Manager" />
              <NavItem view={AppView.CONTEXT_EXPLORER} icon={Telescope} label="Explorer" />
           </div>
@@ -124,7 +124,7 @@ const App: React.FC = () => {
                   {currentView === AppView.STRATEGY_MAP && "Strategic Architecture"}
                   {currentView === AppView.INTEGRATION_HUB && "Integration Hub"}
                   {currentView === AppView.CONTEXT_EXPLORER && "Context & Traceability"}
-                  {currentView === AppView.LIBRARIAN && "The Librarian"}
+                  {currentView === AppView.LIBRARIAN && "Library"}
                   {currentView === AppView.REFERENCE_MANAGER && "Reference Migration"}
                   {currentView === AppView.SETTINGS && "System Settings"}
                </h1>

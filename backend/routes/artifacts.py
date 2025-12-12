@@ -10,17 +10,21 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/api/v1/artifacts", tags=["artifacts"])
 
 # Configuration
-DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
 # Resolve paths relative to project root
 # This file is at: backend/routes/artifacts.py
 # Project root is: backend/../ (one level up from backend/)
 _routes_dir = os.path.dirname(os.path.abspath(__file__))  # backend/routes/
 _backend_dir = os.path.dirname(_routes_dir)  # backend/
 _project_root = os.path.dirname(_backend_dir)  # project root/
-_artifacts_rel = "demo_data/artifacts" if DEMO_MODE else "docs/artifacts"
-ARTIFACTS_ROOT = os.path.join(_project_root, _artifacts_rel)
-# Debug: uncomment to verify path resolution
-# print(f"DEBUG: ARTIFACTS_ROOT={ARTIFACTS_ROOT}, exists={os.path.exists(ARTIFACTS_ROOT)}")
+
+def get_artifacts_root():
+    """Get artifacts root directory based on current DEMO_MODE setting."""
+    demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+    artifacts_rel = "demo_data/artifacts" if demo_mode else "docs/artifacts"
+    return os.path.join(_project_root, artifacts_rel)
+
+# Default ARTIFACTS_ROOT (can be overridden per request)
+ARTIFACTS_ROOT = get_artifacts_root()
 ARTIFACT_TYPES = {
     "implementation_plan": "implementation_plans",
     "assessment": "assessments",
@@ -62,7 +66,8 @@ def get_artifact_path(artifact_type: str, artifact_id: str) -> str:
     # Assuming ID matches filename without extension, or we search for it
     # The ID in spec is "2025-12-08_1430_plan_dashboard-integration"
     # The file is "2025-12-08_1430_plan_dashboard-integration.md"
-    return os.path.join(ARTIFACTS_ROOT, subdir, f"{artifact_id}.md")
+    artifacts_root = get_artifacts_root()
+    return os.path.join(artifacts_root, subdir, f"{artifact_id}.md")
 
 def parse_artifact(file_path: str, include_content: bool = False) -> ArtifactResponse:
     if not os.path.exists(file_path):
@@ -96,13 +101,31 @@ async def list_artifacts(
 ):
     """List artifacts with filtering."""
     items = []
+    
+    # Get current artifacts root (check DEMO_MODE at request time)
+    artifacts_root = get_artifacts_root()
+    
+    # Debug logging
+    if not os.path.exists(artifacts_root):
+        demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+        print(f"WARNING: Artifacts root does not exist: {artifacts_root}")
+        print(f"DEMO_MODE: {demo_mode}")
+        return {"items": [], "total": 0}
 
     # Determine directories to search
     subdirs = [ARTIFACT_TYPES[type]] if type and type in ARTIFACT_TYPES else ARTIFACT_TYPES.values()
 
     for subdir in subdirs:
-        search_path = os.path.join(ARTIFACTS_ROOT, subdir, "*.md")
+        search_path = os.path.join(artifacts_root, subdir, "*.md")
         files = glob.glob(search_path)
+        
+        if not files:
+            # Try alternative: search all subdirectories if specific one is empty
+            alt_path = os.path.join(artifacts_root, "**", "*.md")
+            files = glob.glob(alt_path, recursive=True)
+            # Filter by type if specified
+            if type:
+                files = [f for f in files if subdir in f]
 
         for f in files:
             try:
@@ -110,6 +133,10 @@ async def list_artifacts(
 
                 # Filter by status
                 if status and artifact.status != status:
+                    continue
+                
+                # Filter by type if specified (double-check)
+                if type and artifact.type != type:
                     continue
 
                 items.append(artifact)
@@ -130,10 +157,11 @@ async def get_artifact(id: str):
     """Get a single artifact by ID."""
     # We need to find the file because ID doesn't strictly tell us the type/folder
     # Optimization: Try to guess type from ID if possible, or search all folders
+    artifacts_root = get_artifacts_root()
 
     found_path = None
     for subdir in ARTIFACT_TYPES.values():
-        potential_path = os.path.join(ARTIFACTS_ROOT, subdir, f"{id}.md")
+        potential_path = os.path.join(artifacts_root, subdir, f"{id}.md")
         if os.path.exists(potential_path):
             found_path = potential_path
             break
@@ -161,7 +189,8 @@ async def create_artifact(artifact: ArtifactCreate):
 
     filename = f"{artifact_id}.md"
     subdir = ARTIFACT_TYPES[artifact.type]
-    file_path = os.path.join(ARTIFACTS_ROOT, subdir, filename)
+    artifacts_root = get_artifacts_root()
+    file_path = os.path.join(artifacts_root, subdir, filename)
 
     # Prepare content with frontmatter
     metadata = artifact.dict(exclude={"content"}, exclude_none=True)
@@ -195,9 +224,10 @@ async def create_artifact(artifact: ArtifactCreate):
 async def update_artifact(id: str, update: ArtifactUpdate):
     """Update an existing artifact."""
     # Find file
+    artifacts_root = get_artifacts_root()
     found_path = None
     for subdir in ARTIFACT_TYPES.values():
-        potential_path = os.path.join(ARTIFACTS_ROOT, subdir, f"{id}.md")
+        potential_path = os.path.join(artifacts_root, subdir, f"{id}.md")
         if os.path.exists(potential_path):
             found_path = potential_path
             break
@@ -228,9 +258,10 @@ async def update_artifact(id: str, update: ArtifactUpdate):
 async def delete_artifact(id: str):
     """Delete (archive) an artifact."""
     # Find file
+    artifacts_root = get_artifacts_root()
     found_path = None
     for subdir in ARTIFACT_TYPES.values():
-        potential_path = os.path.join(ARTIFACTS_ROOT, subdir, f"{id}.md")
+        potential_path = os.path.join(artifacts_root, subdir, f"{id}.md")
         if os.path.exists(potential_path):
             found_path = potential_path
             break
@@ -240,7 +271,7 @@ async def delete_artifact(id: str):
 
     try:
         # Archive instead of delete
-        archive_dir = os.path.join(ARTIFACTS_ROOT, "archive")
+        archive_dir = os.path.join(artifacts_root, "archive")
         os.makedirs(archive_dir, exist_ok=True)
 
         filename = os.path.basename(found_path)
