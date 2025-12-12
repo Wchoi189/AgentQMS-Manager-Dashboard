@@ -20,7 +20,7 @@ This shim will be deprecated in a future version.
 from __future__ import annotations
 
 # Re-export everything from the modular package
-from agent_tools.core.plugins import (
+from AgentQMS.agent_tools.core.plugins import (
     DiscoveredPlugin,
     PluginDiscovery,
     PluginLoader,
@@ -56,7 +56,7 @@ __all__ = [
 
 def main() -> int:
     """CLI entry point - delegates to plugins.cli."""
-    from AgentQMS.agent_tools.core.plugins.cli import main as cli_main
+    from .plugins.cli import main as cli_main
     return cli_main()
 
 

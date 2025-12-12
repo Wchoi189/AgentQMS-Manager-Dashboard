@@ -113,7 +113,7 @@ def generate_index_content(directory: Path, artifact_type: str) -> str:
 
 def main():
     """Main entry point."""
-    from AgentQMS.agent_tools.utils.paths import get_artifacts_dir
+    from agent_tools.utils.paths import get_artifacts_dir
     
     artifacts_root = get_artifacts_dir()
     print(f"🔄 Reindexing artifacts in {artifacts_root}")

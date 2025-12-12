@@ -27,7 +27,7 @@ import yaml
 
 # Try to import context bundle functions for validation
 try:
-    from AgentQMS.agent_tools.core.context_bundle import (
+    from agent_tools.core.context_bundle import (
         is_fresh,
         list_available_bundles,
         load_bundle_definition,
@@ -40,7 +40,7 @@ except ImportError:
 
 # Try to import plugin registry for extensibility
 try:
-    from AgentQMS.agent_tools.core.plugins import get_plugin_registry
+    from agent_tools.core.plugins import get_plugin_registry
 
     PLUGINS_AVAILABLE = True
 except ImportError:
@@ -141,7 +141,7 @@ class ArtifactValidator:
     def __init__(self, artifacts_root: str | Path | None = None, strict_mode: bool = True):
         # Default to the configured artifacts directory if none is provided
         if artifacts_root is None:
-            from AgentQMS.agent_tools.utils.paths import get_artifacts_dir
+            from agent_tools.utils.paths import get_artifacts_dir
 
             self.artifacts_root = get_artifacts_dir().resolve()
         else:
@@ -215,7 +215,7 @@ class ArtifactValidator:
     def _load_excluded_directories(self) -> list[str]:
         """Load excluded directories from settings.yaml."""
         try:
-            from AgentQMS.agent_tools.utils.config import load_config
+            from agent_tools.utils.config import load_config
 
             config = load_config()
             return config.get("validation", {}).get("excluded_directories", ["archive", "deprecated"])
@@ -481,7 +481,7 @@ class ArtifactValidator:
         """Ensure artifacts are in docs/artifacts/ not root /artifacts/."""
         try:
             # Get the path relative to project root
-            from AgentQMS.agent_tools.utils.paths import get_project_root
+            from agent_tools.utils.paths import get_project_root
             project_root = get_project_root()
             relative_path = file_path.relative_to(project_root)
             path_str = str(relative_path).replace("\\", "/")
@@ -797,7 +797,7 @@ class ArtifactValidator:
 
         try:
             # Get project root using utility function
-            from AgentQMS.agent_tools.utils.paths import get_project_root
+            from agent_tools.utils.paths import get_project_root
             project_root = get_project_root()
 
             available_bundles = list_available_bundles()

@@ -46,7 +46,7 @@ class PluginLoader:
             project_root: Project root directory. If None, auto-detected.
         """
         if project_root is None:
-            from AgentQMS.agent_tools.utils.paths import get_project_root
+            from agent_tools.utils.paths import get_project_root
             project_root = get_project_root()
 
         self.project_root = project_root

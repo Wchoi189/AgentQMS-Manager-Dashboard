@@ -27,7 +27,7 @@ Usage examples:
 ensure_project_root_on_sys_path()
 
 try:
-    from AgentQMS.agent_tools.core.context_bundle import (
+    from agent_tools.core.context_bundle import (
         get_context_bundle,
         list_available_bundles,
         print_context_bundle,
@@ -49,7 +49,7 @@ def _get_doc_index_path() -> Path:
     if new_path.exists():
         return new_path
     # Fall back to deprecated location
-    from AgentQMS.agent_tools.utils.paths import get_project_root
+    from agent_tools.utils.paths import get_project_root
     deprecated_path = get_project_root() / "docs_deprecated" / "ai_handbook" / "index.json"
     if deprecated_path.exists():
         return deprecated_path

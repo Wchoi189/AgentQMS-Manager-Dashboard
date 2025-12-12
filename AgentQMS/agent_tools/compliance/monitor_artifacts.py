@@ -31,7 +31,7 @@ class ArtifactMonitor:
 
     def __init__(self, artifacts_root: str | Path | None = None):
         if artifacts_root is None:
-            from AgentQMS.agent_tools.utils.paths import get_artifacts_dir
+            from agent_tools.utils.paths import get_artifacts_dir
             artifacts_root = get_artifacts_dir()
         
         self.artifacts_root = Path(artifacts_root)

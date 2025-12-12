@@ -24,15 +24,15 @@ from typing import Any
 
 # Try to import plugin registry for extensibility
 try:
-    from AgentQMS.agent_tools.core.plugins import get_plugin_registry
+    from agent_tools.core.plugins import get_plugin_registry
 
     PLUGINS_AVAILABLE = True
 except ImportError:
     PLUGINS_AVAILABLE = False
 # Try to import new utilities for branch and timestamp handling
 try:
-    from AgentQMS.agent_tools.utils.git import get_current_branch
-    from AgentQMS.agent_tools.utils.timestamps import get_kst_timestamp
+    from agent_tools.utils.git import get_current_branch
+    from agent_tools.utils.timestamps import get_kst_timestamp
 
     UTILITIES_AVAILABLE = True
 except ImportError:

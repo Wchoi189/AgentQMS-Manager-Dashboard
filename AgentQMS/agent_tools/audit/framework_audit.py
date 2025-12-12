@@ -67,7 +67,7 @@ class FrameworkAudit:
 
     def _get_project_root(self) -> Path:
         """Get project root directory."""
-        from AgentQMS.agent_tools.utils.paths import get_project_root
+        from agent_tools.utils.paths import get_project_root
         return get_project_root()
 
     def audit_plugins(self) -> list[dict[str, Any]]:

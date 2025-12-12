@@ -232,7 +232,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     # Write snapshot if requested
     if args.write_snapshot:
-        from AgentQMS.agent_tools.utils.paths import get_project_root
+        from agent_tools.utils.paths import get_project_root
         state_dir = (project_root or get_project_root()) / ".agentqms" / "state"
         writer = SnapshotWriter(state_dir)
         snapshot_path = writer.write(registry, loader.get_discovery_paths())

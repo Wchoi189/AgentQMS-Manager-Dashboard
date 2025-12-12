@@ -286,7 +286,7 @@ def run_reindex(project_root: Path, dry_run: bool = False) -> bool:
         return True
 
     try:
-        from AgentQMS.agent_tools.documentation.reindex_artifacts import main as reindex_main
+        from agent_tools.documentation.reindex_artifacts import main as reindex_main
         result = reindex_main()
         return result == 0
     except Exception as e:
@@ -296,7 +296,7 @@ def run_reindex(project_root: Path, dry_run: bool = False) -> bool:
 
 def run_validation() -> list[dict[str, Any]]:
     """Run validation and return results."""
-    from AgentQMS.agent_tools.compliance.validate_artifacts import ArtifactValidator
+    from agent_tools.compliance.validate_artifacts import ArtifactValidator
     validator = ArtifactValidator()
     return validator.validate_all()
 
@@ -317,7 +317,7 @@ def main():
 
     args = parser.parse_args()
 
-    from AgentQMS.agent_tools.utils.paths import get_project_root
+    from agent_tools.utils.paths import get_project_root
     project_root = get_project_root()
 
     # Run validation to get current state

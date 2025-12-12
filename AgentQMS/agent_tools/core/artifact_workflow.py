@@ -45,7 +45,7 @@ _assert_clean_boundaries()
 
 # Try to import context bundle functions for hooks
 try:
-    from AgentQMS.agent_tools.core.context_bundle import (
+    from agent_tools.core.context_bundle import (
         list_available_bundles,
         load_bundle_definition,
         validate_bundle_files,
@@ -63,7 +63,7 @@ class ArtifactWorkflow:
         # Default to the configured artifacts directory if none is provided
         if artifacts_root is None:
             # Import lazily to avoid circular imports at module load time
-            from AgentQMS.agent_tools.utils.paths import get_artifacts_dir
+            from agent_tools.utils.paths import get_artifacts_dir
 
             root = get_artifacts_dir()
         else:
@@ -246,7 +246,7 @@ class ArtifactWorkflow:
             owner: Artifact owner
         """
         try:
-            from AgentQMS.agent_tools.utilities.tracking_integration import (
+            from agent_tools.utilities.tracking_integration import (
                 register_artifact_in_tracking,
             )
 

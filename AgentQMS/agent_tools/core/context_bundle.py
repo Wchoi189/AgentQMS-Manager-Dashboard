@@ -47,7 +47,7 @@ BUNDLES_DIR = PROJECT_ROOT / "AgentQMS" / "knowledge" / "context_bundles"
 
 # Try to import plugin registry for extensibility
 try:
-    from AgentQMS.agent_tools.core.plugins import get_plugin_registry
+    from agent_tools.core.plugins import get_plugin_registry
 
     PLUGINS_AVAILABLE = True
 except ImportError:
@@ -400,7 +400,7 @@ def auto_suggest_context(task_description: str) -> dict[str, Any]:
     }
     
     try:
-        from AgentQMS.agent_tools.core.workflow_detector import suggest_workflows
+        from agent_tools.core.workflow_detector import suggest_workflows
         
         workflow_suggestions = suggest_workflows(task_description)
         suggestions["suggested_workflows"] = workflow_suggestions.get("workflows", [])

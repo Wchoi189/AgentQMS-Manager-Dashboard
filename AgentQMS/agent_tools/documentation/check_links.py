@@ -147,7 +147,7 @@ def main():
                         help="Exclude AgentQMS directory from link checking (default: included)")
     args = parser.parse_args()
     
-    from AgentQMS.agent_tools.utils.paths import get_project_root
+    from agent_tools.utils.paths import get_project_root
     
     project_root = get_project_root()
     docs_dir = project_root / "docs"
