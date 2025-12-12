@@ -1,3 +1,10 @@
+---
+title: "AgentQMS Dashboard - Demo Deployment Guide"
+status: draft
+last_updated: 2025-12-12
+tags: [deployment, demo]
+---
+
 # AgentQMS Dashboard - Demo Deployment Guide
 
 **Purpose**: Deploy AgentQMS Dashboard to free hosting (Google AI Studio, Vercel, Railway, etc.) for Kaggle Vibe Code with Gemini 3 competition demo.

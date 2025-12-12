@@ -1,3 +1,10 @@
+---
+title: "Demo Deployment - Quick Start"
+status: draft
+last_updated: 2025-12-12
+tags: [deployment, quickstart]
+---
+
 # Demo Deployment - Quick Start
 
 ## For Kaggle Vibe Code with Gemini 3 Competition
@@ -11,7 +18,7 @@
 2. ✅ `backend/` - FastAPI server (already exists)
 3. ✅ `demo_data/` - 5 sample artifacts (CREATED)
 4. ✅ `demo_scripts/` - 3 validation stubs (CREATED)
-5. ✅ `DEMO_DEPLOYMENT_GUIDE.md` - Full deployment guide (CREATED)
+5. ✅ `docs/deployment/demo-deployment-guide.md` - Full deployment guide (CREATED)
 6. ✅ `create_demo_data_simple.sh` - Setup script (CREATED)
 
 ---
@@ -228,7 +235,7 @@ open http://localhost:8000
   - [ ] `frontend/components/ArtifactGenerator.tsx` - AI-powered UI
   - [ ] `backend/routes/tools.py` - Tool execution
 - [ ] **Documentation**:
-  - [ ] DEMO_DEPLOYMENT_GUIDE.md (comprehensive)
+  - [ ] docs/deployment/demo-deployment-guide.md (comprehensive)
   - [ ] README.md (quick start)
   - [ ] API documentation (OpenAPI at /docs)
 
@@ -281,7 +288,7 @@ open http://localhost:8000
 
 ## Need Help?
 
-- **Full Guide**: See `DEMO_DEPLOYMENT_GUIDE.md`
+- **Full Guide**: See `docs/deployment/demo-deployment-guide.md`
 - **API Docs**: Visit `/docs` endpoint on backend
 - **Source Code**: Everything is in this repository
 

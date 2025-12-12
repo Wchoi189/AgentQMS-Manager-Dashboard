@@ -49,6 +49,15 @@ Click any screenshot to view in full size. These screens show the dashboard over
 # Install all dependencies (frontend + backend)
 make install
 
+# Create demo data (for local testing)
+./create_demo_data_simple.sh
+
+# Add more sample artifacts (optional)
+./add_more_demo_artifacts.sh  # Adds 12 more artifacts (18 total)
+
+# Set demo mode (optional, for testing without full AgentQMS setup)
+export DEMO_MODE=true
+
 # Start both servers
 make dev
 
@@ -58,6 +67,26 @@ make dev-backend   # Port 8000
 ```
 
 Access the dashboard at **http://localhost:3000**
+
+### Local Testing
+
+**📖 For comprehensive local testing instructions, see [Local Testing Guide](docs/guides/local-testing-guide.md)**
+
+**🐛 Having issues? See [Troubleshooting Guide](docs/guides/troubleshooting.md)**
+
+Quick start:
+```bash
+# Verify setup
+./test_local_setup.sh
+
+# Start both servers (recommended)
+export DEMO_MODE=true
+./start_dev.sh
+
+# Or start separately (better for debugging)
+# Terminal 1: export DEMO_MODE=true && cd backend && python server.py
+# Terminal 2: cd frontend && npm run dev
+```
 
 ### Available Commands
 

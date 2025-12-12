@@ -55,7 +55,7 @@
 
 ## Notes
 
-- **IMPLEMENTATION_PLAN_COPY.md** archived as reference document
+- **Implementation Plan Snapshot** archived as reference: `docs/plans/notes/implementation-plan-copy.md`
 - **Root loose docs** organized into appropriate subdirectories
-- **CHANGELOG.md** updated with all major changes
+- **Changelog** updated with all major changes: `docs/meta/CHANGELOG.md`
 - **Project is production-ready** for core features

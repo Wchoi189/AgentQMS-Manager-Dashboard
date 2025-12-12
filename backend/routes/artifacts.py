@@ -10,12 +10,23 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/api/v1/artifacts", tags=["artifacts"])
 
 # Configuration
-ARTIFACTS_ROOT = "docs/artifacts"
+DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+# Resolve paths relative to project root
+# This file is at: backend/routes/artifacts.py
+# Project root is: backend/../ (one level up from backend/)
+_routes_dir = os.path.dirname(os.path.abspath(__file__))  # backend/routes/
+_backend_dir = os.path.dirname(_routes_dir)  # backend/
+_project_root = os.path.dirname(_backend_dir)  # project root/
+_artifacts_rel = "demo_data/artifacts" if DEMO_MODE else "docs/artifacts"
+ARTIFACTS_ROOT = os.path.join(_project_root, _artifacts_rel)
+# Debug: uncomment to verify path resolution
+# print(f"DEBUG: ARTIFACTS_ROOT={ARTIFACTS_ROOT}, exists={os.path.exists(ARTIFACTS_ROOT)}")
 ARTIFACT_TYPES = {
     "implementation_plan": "implementation_plans",
     "assessment": "assessments",
     "audit": "audits",
-    "bug_report": "bug_reports"
+    "bug_report": "bug_reports",
+    "design": "design_documents"  # Add design_documents support
 }
 
 # Models

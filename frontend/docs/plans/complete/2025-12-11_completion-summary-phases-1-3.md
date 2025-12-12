@@ -300,7 +300,7 @@ make help                 # Show all commands
    - Updated development roadmap (`2025-12-08-1430_plan-development-roadmap.md`)
 
 4. **Implementation Plan Copy**:
-   - `IMPLEMENTATION_PLAN_COPY.md` - Snapshot for extended work
+   - `docs/plans/notes/implementation-plan-copy.md` - Snapshot for extended work
 
 ### Success Criteria
 

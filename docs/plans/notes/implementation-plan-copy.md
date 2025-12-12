@@ -1,3 +1,10 @@
+---
+title: "Implementation Plan Snapshot (2025-12-11)"
+status: archive
+last_updated: 2025-12-12
+tags: [plan, reference, snapshot]
+---
+
 # Implementation Plan Snapshot (2025-12-11)
 
 This is a working copy of the original implementation plan for documentation update work.

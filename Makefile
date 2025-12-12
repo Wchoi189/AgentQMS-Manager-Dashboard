@@ -79,10 +79,20 @@ install-backend:
 # Development Servers
 # ═════════════════════════════════════════════════════════════════════════════
 
-dev: dev-backend dev-frontend
+dev:
+	@echo "$(BLUE)Starting both servers...$(NC)"
+	@echo "$(BLUE)Starting backend dev server on port 8000...$(NC)"
+	@cd $(BACKEND_DIR) && $(PYTHON) server.py > /tmp/backend.log 2>&1 &
+	@sleep 2
+	@echo "$(BLUE)Starting frontend dev server on port 3000...$(NC)"
+	@cd $(FRONTEND_DIR) && npm run dev > /tmp/frontend.log 2>&1 &
+	@sleep 3
 	@echo "$(GREEN)✓ Both servers running$(NC)"
 	@echo "  Frontend: http://localhost:3000"
 	@echo "  Backend:  http://localhost:8000"
+	@echo ""
+	@echo "View logs with: $(BLUE)make logs-backend$(NC) or $(BLUE)make logs-frontend$(NC)"
+	@echo "Stop servers with: $(BLUE)make stop-servers$(NC)"
 
 dev-frontend:
 	@echo "$(BLUE)Starting frontend dev server on port 3000...$(NC)"

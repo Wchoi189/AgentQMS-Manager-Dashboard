@@ -18,11 +18,19 @@ tags: [index, navigation, toc]
 **START HERE**: [Progress Tracker](meta/2025-12-08-1430_meta-progress-tracker.md)
 
 **By Category**:
+- **Deployment** — [Demo Deployment Guide](deployment/demo-deployment-guide.md), [Demo Quick Start](deployment/demo-quickstart.md)
+- **Guides** — [Local Testing](guides/local-testing-guide.md), [Troubleshooting](guides/troubleshooting.md), [Artifact Management](guides/artifact-management.md), [Verify Demo Data](guides/verify-demo-data.md)
 - **Architecture** — [Frontend Patterns](architecture/2025-12-08-1430_arch-frontend-patterns.md), [Diagrams](architecture/2025-12-08-1430_arch-system-diagrams.md)
 - **API** — [Contracts](api/2025-12-08-1430_api-contracts-spec.md), [Principles](api/2025-12-08-1430_api-design-principles.md)
 - **Development** — [Bridge Guide](development/2025-12-08-1430_dev-bridge-implementation.md), [Features](development/2025-12-08-1430_dev-dashboard-features.md)
-- **Plans** — [Roadmap](plans/in-progress/2025-12-08-1430_plan-development-roadmap.md), [Risk](plans/notes/2025-12-08-1430_plan-risk-assessment.md)
-- **Meta** — [AI Instructions](meta/2025-12-08-1430_meta-ai-instructions.md), [Session Handovers](meta/)
+- **Plans** — [Roadmap](plans/in-progress/2025-12-08-1430_plan-development-roadmap.md), [Risk](plans/notes/2025-12-08-1430_plan-risk-assessment.md), [Session Handovers](plans/session/)
+- **Meta** — [AI Instructions](meta/2025-12-08-1430_meta-ai-instructions.md), [Changelog](meta/CHANGELOG.md), [Sync Instructions](meta/SYNC_INSTRUCTIONS.md)
+
+## Conventions
+
+- Use YAML frontmatter with `title`, `status`, `last_updated`, and `tags`.
+- Keep filenames kebab-case and place docs in the closest matching subdirectory.
+- Prefer relative links within `docs/` and keep assets under `docs/assets/`.
 
 ## Status
 
@@ -50,16 +58,19 @@ tags: [index, navigation, toc]
 
 ```
 ├── architecture/     # System design
-├── api/             # API specs
-├── development/     # Implementation guides
-├── plans/           # Roadmaps, notes, sessions
+├── api/              # API specs
+├── assets/           # Shared assets (images, diagrams)
+├── deployment/       # Deployment guides and quickstarts
+├── development/      # Implementation guides
+├── guides/           # How-to and troubleshooting guides
+├── plans/            # Roadmaps, notes, sessions
 │   ├── draft/
 │   ├── in-progress/
 │   ├── complete/
 │   ├── notes/
-│   └── session/     # Session handovers
-├── meta/            # Progress tracker, AI protocol
-└── README.md        # This file
+│   └── session/      # Session handovers
+├── meta/             # Progress tracker, AI protocol, changelog
+└── README.md         # This file
 ```
 
 ## Session Handovers
