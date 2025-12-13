@@ -20,6 +20,11 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Add project root to path before importing AgentQMS modules
+_project_root = Path(__file__).resolve().parent.parent.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
 from AgentQMS.agent_tools.utils.runtime import ensure_project_root_on_sys_path
 from AgentQMS.agent_tools.compliance.validate_artifacts import ArtifactValidator
 
@@ -31,8 +36,27 @@ class ArtifactMonitor:
 
     def __init__(self, artifacts_root: str | Path | None = None):
         if artifacts_root is None:
-            from agent_tools.utils.paths import get_artifacts_dir
-            artifacts_root = get_artifacts_dir()
+            from AgentQMS.agent_tools.utils.paths import get_artifacts_dir, get_project_root
+            import os
+            
+            # Try the configured path first
+            configured_path = get_artifacts_dir()
+            
+            # Auto-detect: if configured path doesn't exist, try alternatives
+            if not configured_path.exists():
+                project_root = get_project_root()
+                # Try demo_data/artifacts
+                demo_path = project_root / "demo_data" / "artifacts"
+                if demo_path.exists():
+                    artifacts_root = demo_path
+                # Try docs/artifacts
+                elif (project_root / "docs" / "artifacts").exists():
+                    artifacts_root = project_root / "docs" / "artifacts"
+                else:
+                    # Use configured path even if it doesn't exist (will fail later with better error)
+                    artifacts_root = configured_path
+            else:
+                artifacts_root = configured_path
         
         self.artifacts_root = Path(artifacts_root)
         self.validator = ArtifactValidator(self.artifacts_root)

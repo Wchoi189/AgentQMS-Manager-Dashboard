@@ -32,15 +32,47 @@ async def get_compliance_metrics():
     _routes_dir = os.path.dirname(os.path.abspath(__file__))
     _backend_dir = os.path.dirname(_routes_dir)
     _project_root = os.path.dirname(_backend_dir)
-    DEMO_MODE_LOCAL = os.getenv("DEMO_MODE", "false").lower() == "true"
-    _artifacts_rel = "demo_data/artifacts" if DEMO_MODE_LOCAL else "docs/artifacts"
-    artifacts_root = os.path.join(_project_root, _artifacts_rel)
+    
+    def get_artifacts_root():
+        """Get artifacts root directory with auto-detection."""
+        demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+        
+        # Try the configured path first
+        artifacts_rel = "demo_data/artifacts" if demo_mode else "docs/artifacts"
+        artifacts_root = os.path.join(_project_root, artifacts_rel)
+        
+        # Auto-detect: if configured path doesn't exist, try the alternative
+        if not os.path.exists(artifacts_root):
+            alt_artifacts_rel = "docs/artifacts" if demo_mode else "demo_data/artifacts"
+            alt_artifacts_root = os.path.join(_project_root, alt_artifacts_rel)
+            if os.path.exists(alt_artifacts_root):
+                return alt_artifacts_root
+        
+        return artifacts_root
+    
+    artifacts_root = get_artifacts_root()
+    
+    # Debug logging
+    print(f"DEBUG: Compliance metrics - artifacts_root: {artifacts_root}")
+    print(f"DEBUG: Compliance metrics - artifacts_root exists: {os.path.exists(artifacts_root)}")
     
     try:
-        artifact_files = glob.glob(os.path.join(artifacts_root, "**", "*.md"), recursive=True)
+        search_pattern = os.path.join(artifacts_root, "**", "*.md")
+        artifact_files = glob.glob(search_pattern, recursive=True)
         total = len(artifact_files)
         
+        print(f"DEBUG: Compliance metrics - found {total} artifact files")
+        
         if total == 0:
+            print(f"WARNING: No artifacts found in {artifacts_root}")
+            # Try to list what's actually there
+            if os.path.exists(artifacts_root):
+                try:
+                    import os as os_module
+                    contents = os_module.listdir(artifacts_root)
+                    print(f"DEBUG: Contents of {artifacts_root}: {contents}")
+                except:
+                    pass
             return {
                 "schema_compliance": 0,
                 "branch_integration": 0,

@@ -42,6 +42,28 @@ async def health_check():
 async def version():
     return {"version": "0.1.0"}
 
+@router.get("/demo-mode")
+async def get_demo_mode():
+    """Get current DEMO_MODE setting and artifacts path."""
+    demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+    demo_mode_env = os.getenv("DEMO_MODE", "not set")
+    
+    # Check which paths exist
+    demo_path = os.path.join(_project_root, "demo_data/artifacts")
+    docs_path = os.path.join(_project_root, "docs/artifacts")
+    
+    artifacts_root = get_artifacts_root()
+    
+    return {
+        "demo_mode_env": demo_mode_env,
+        "demo_mode_interpreted": demo_mode,
+        "artifacts_root": artifacts_root,
+        "artifacts_root_exists": os.path.exists(artifacts_root),
+        "demo_data_exists": os.path.exists(demo_path),
+        "docs_artifacts_exists": os.path.exists(docs_path),
+        "using_demo_data": "demo_data" in artifacts_root
+    }
+
 @router.get("/stats", response_model=SystemStats)
 async def get_stats():
     """Get real system statistics from artifacts."""

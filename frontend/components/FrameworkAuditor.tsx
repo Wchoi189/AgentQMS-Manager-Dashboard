@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, CheckCircle, Loader2, ArrowRight, Terminal, Wand2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, AlertTriangle, CheckCircle, Loader2, ArrowRight, Terminal, Wand2, FileText } from 'lucide-react';
 import { auditDocumentation } from '../services/aiService';
-import { bridgeService } from '../services/bridgeService';
+import { bridgeService, Artifact } from '../services/bridgeService';
 import { AuditResponse, AuditToolConfig } from '../types';
 import TrackingStatusComponent from './TrackingStatus';
 
@@ -13,7 +13,7 @@ const AUDIT_TOOLS: AuditToolConfig[] = [
         name: 'Frontmatter Validator',
         description: 'Checks for mandatory fields (branch_name, timestamp) in YAML header.',
         command: 'python AgentQMS/agent_tools/audit/validate_frontmatter.py',
-        scriptPath: 'agent_tools/audit/validate_frontmatter.py',
+        scriptPath: 'AgentQMS/agent_tools/audit/validate_frontmatter.py',
         args: [{ name: 'Target File', flag: '--file', type: 'text' }]
     },
     {
@@ -21,7 +21,7 @@ const AUDIT_TOOLS: AuditToolConfig[] = [
         name: 'Dead Link Checker',
         description: 'Scans markdown files for broken internal and external links.',
         command: 'python AgentQMS/agent_tools/audit/check_links.py',
-        scriptPath: 'agent_tools/audit/check_links.py',
+        scriptPath: 'AgentQMS/agent_tools/audit/check_links.py',
         args: [{ name: 'Directory', flag: '--dir', type: 'text' }]
     },
     {
@@ -29,8 +29,40 @@ const AUDIT_TOOLS: AuditToolConfig[] = [
         name: 'Structural Integrity',
         description: 'Verifies that the folder structure matches the .agentqms/config.json rules.',
         command: 'python AgentQMS/agent_tools/audit/structure_check.py',
-        scriptPath: 'agent_tools/audit/structure_check.py',
+        scriptPath: 'AgentQMS/agent_tools/audit/structure_check.py',
         args: []
+    },
+    {
+        id: 'ast_analyze',
+        name: 'AST Code Analysis',
+        description: 'Analyze Python code structure using Abstract Syntax Trees.',
+        command: 'python AgentQMS/interface/cli_tools/ast_analysis.py analyze',
+        scriptPath: 'ast_analyze',
+        args: [{ name: 'Path', flag: '', type: 'text' }]
+    },
+    {
+        id: 'ast_generate_tests',
+        name: 'Generate Test Scaffolds',
+        description: 'Generate pytest test scaffolds from Python code.',
+        command: 'python AgentQMS/interface/cli_tools/ast_analysis.py generate-tests',
+        scriptPath: 'ast_generate_tests',
+        args: [{ name: 'Python File', flag: '', type: 'text' }]
+    },
+    {
+        id: 'ast_extract_docs',
+        name: 'Extract Documentation',
+        description: 'Extract documentation from Python code as Markdown.',
+        command: 'python AgentQMS/interface/cli_tools/ast_analysis.py extract-docs',
+        scriptPath: 'ast_extract_docs',
+        args: [{ name: 'Python File', flag: '', type: 'text' }]
+    },
+    {
+        id: 'ast_check_quality',
+        name: 'Code Quality Check',
+        description: 'Check code quality metrics and detect code smells.',
+        command: 'python AgentQMS/interface/cli_tools/ast_analysis.py check-quality',
+        scriptPath: 'ast_check_quality',
+        args: [{ name: 'Path', flag: '', type: 'text' }]
     }
 ];
 
@@ -46,6 +78,46 @@ const FrameworkAuditor: React.FC = () => {
   const [selectedTool, setSelectedTool] = useState<AuditToolConfig>(AUDIT_TOOLS[0]);
   const [toolArgs, setToolArgs] = useState<Record<string, string>>({});
   const [generatedCommand, setGeneratedCommand] = useState('');
+
+  // Artifacts State
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [loadingArtifacts, setLoadingArtifacts] = useState(false);
+  const [selectedArtifact, setSelectedArtifact] = useState<Artifact | null>(null);
+
+  useEffect(() => {
+    loadArtifacts();
+  }, []);
+
+  const loadArtifacts = async () => {
+    setLoadingArtifacts(true);
+    try {
+      const response = await bridgeService.listArtifacts({ limit: 50 });
+      setArtifacts(response.items || []);
+    } catch (error) {
+      console.error('Failed to load artifacts:', error);
+    } finally {
+      setLoadingArtifacts(false);
+    }
+  };
+
+  const handleArtifactSelect = async (artifact: Artifact) => {
+    setSelectedArtifact(artifact);
+    // Load artifact content for AI analysis
+    try {
+      const content = await bridgeService.getArtifact(artifact.id);
+      setInputContent(content.content || '');
+      // Auto-fill file path in tool args if it's a file-based tool
+      if (selectedTool.args.some(arg => arg.name === 'Target File')) {
+        const fileArg = selectedTool.args.find(arg => arg.name === 'Target File');
+        if (fileArg) {
+          setToolArgs({ [fileArg.name]: artifact.id });
+          updateToolCommand(selectedTool, { [fileArg.name]: artifact.id });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load artifact content:', error);
+    }
+  };
 
   const handleAiAudit = async () => {
     if (!inputContent.trim()) return;
@@ -91,14 +163,74 @@ const FrameworkAuditor: React.FC = () => {
     setToolOutput(null);
     try {
       const result = await bridgeService.executeTool(toolId, {});
-      setToolOutput({
-        tool: toolId,
-                output: result.output,
-                error: result.success ? undefined : (result.error || 'Tool reported failure'),
-      });
+      // For validation/compliance tools, show output even if return code is non-zero
+      // These tools exit with non-zero when violations are found, which is expected
+      const isValidationTool = ['validate', 'compliance', 'boundary'].includes(toolId);
+      const hasOutput = result.output && result.output.trim().length > 0;
+      
+      if (isValidationTool && hasOutput) {
+        // Show output as success even if return code indicates violations found
+        setToolOutput({
+          tool: toolId,
+          output: result.output,
+          error: undefined,
+        });
+      } else {
+        // For other tools, respect the success flag
+        setToolOutput({
+          tool: toolId,
+          output: result.output,
+          error: result.success ? undefined : (result.error || 'Tool reported failure'),
+        });
+      }
     } catch (err) {
       setToolOutput({
         tool: toolId,
+        output: '',
+        error: err instanceof Error ? err.message : 'Unknown error'
+      });
+    } finally {
+      setRunningTool(null);
+    }
+  };
+
+  const runSelectedTool = async () => {
+    if (!selectedTool) return;
+    
+    setRunningTool(selectedTool.id);
+    setToolOutput(null);
+    
+    try {
+      // Build args object from toolArgs
+      const args: Record<string, string> = {};
+      selectedTool.args.forEach(arg => {
+        const val = toolArgs[arg.name];
+        if (val) {
+          // For AST tools, pass the value directly (they don't use flags)
+          if (selectedTool.id.startsWith('ast_')) {
+            // AST tools expect the path/file as a positional argument
+            // Use a generic key that will be converted to positional args
+            args['path'] = val;
+          } else {
+            // Extract the flag value (e.g., "--file" -> "file")
+            const flagKey = arg.flag.replace(/^-+/, '');
+            args[flagKey] = val;
+          }
+        }
+      });
+      
+      // Use scriptPath as tool_id for direct script execution, or tool ID for mapped tools
+      const toolId = selectedTool.id.startsWith('ast_') ? selectedTool.id : (selectedTool.scriptPath || selectedTool.id);
+      const result = await bridgeService.executeTool(toolId, args);
+      
+      setToolOutput({
+        tool: selectedTool.name,
+        output: result.output,
+        error: result.success ? undefined : (result.error || 'Tool reported failure'),
+      });
+    } catch (err) {
+      setToolOutput({
+        tool: selectedTool.name,
         output: '',
         error: err instanceof Error ? err.message : 'Unknown error'
       });
@@ -273,7 +405,36 @@ const FrameworkAuditor: React.FC = () => {
         </div>
       ) : (
           <div className="h-full flex flex-col animate-in fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-full">
+                  {/* Artifacts List */}
+                  <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 flex flex-col">
+                      <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                          <FileText size={16} /> Artifacts
+                      </h3>
+                      {loadingArtifacts ? (
+                          <div className="text-sm text-slate-500">Loading...</div>
+                      ) : artifacts.length === 0 ? (
+                          <div className="text-sm text-slate-500">No artifacts found</div>
+                      ) : (
+                          <div className="flex-1 overflow-y-auto space-y-2">
+                              {artifacts.map(artifact => (
+                                  <button
+                                      key={artifact.id}
+                                      onClick={() => handleArtifactSelect(artifact)}
+                                      className={`w-full text-left p-2 rounded-lg border transition-all ${
+                                          selectedArtifact?.id === artifact.id
+                                          ? 'bg-purple-600/20 border-purple-500 text-white'
+                                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
+                                      }`}
+                                  >
+                                      <div className="font-semibold text-xs truncate">{artifact.title}</div>
+                                      <div className="text-xs opacity-70 mt-1 truncate">{artifact.type}</div>
+                                  </button>
+                              ))}
+                          </div>
+                      )}
+                  </div>
+
                   {/* Tool Selection */}
                   <div className="bg-slate-800 rounded-xl border border-slate-700 p-4">
                       <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Available Tools</h3>
@@ -285,6 +446,15 @@ const FrameworkAuditor: React.FC = () => {
                                     setSelectedTool(tool);
                                     setToolArgs({});
                                     setGeneratedCommand(tool.command);
+                                    // Auto-fill artifact path if artifact is selected
+                                    if (selectedArtifact && tool.args.some(arg => arg.name === 'Target File')) {
+                                        const fileArg = tool.args.find(arg => arg.name === 'Target File');
+                                        if (fileArg) {
+                                            const newArgs = { [fileArg.name]: selectedArtifact.id };
+                                            setToolArgs(newArgs);
+                                            updateToolCommand(tool, newArgs);
+                                        }
+                                    }
                                 }}
                                 className={`w-full text-left p-3 rounded-lg border transition-all ${
                                     selectedTool.id === tool.id
@@ -329,7 +499,7 @@ const FrameworkAuditor: React.FC = () => {
                           )}
                       </div>
 
-                      <div className="mt-auto">
+                      <div className="mt-auto space-y-4">
                           <label className="block text-xs font-semibold text-slate-500 uppercase mb-2">Generated Execution Command</label>
                           <div className="flex gap-2">
                               <code className="flex-1 bg-black rounded-lg p-4 font-mono text-green-400 text-sm border border-slate-800">
@@ -346,10 +516,40 @@ const FrameworkAuditor: React.FC = () => {
                                   <span className="text-xs">Copy</span>
                               </button>
                           </div>
-                          <p className="text-xs text-yellow-500/80 mt-2 flex items-center gap-1">
-                              <AlertTriangle size={12} />
-                              Browser cannot execute Python directly. Copy command to run locally.
-                          </p>
+                          
+                          <button
+                            onClick={runSelectedTool}
+                            disabled={runningTool !== null}
+                            className={`w-full py-3 rounded-lg flex items-center justify-center gap-2 font-semibold transition-all ${
+                              runningTool !== null
+                                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20'
+                            }`}
+                          >
+                            {runningTool === selectedTool.id ? (
+                              <>
+                                <Loader2 className="animate-spin" size={18} />
+                                Running...
+                              </>
+                            ) : (
+                              <>
+                                <Terminal size={18} />
+                                Run Tool
+                              </>
+                            )}
+                          </button>
+                          
+                          {toolOutput && (
+                            <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 max-h-60 overflow-y-auto">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-semibold text-slate-400">Output: {toolOutput.tool}</span>
+                                {toolOutput.error && <AlertTriangle size={14} className="text-red-400" />}
+                              </div>
+                              <pre className="text-xs text-slate-300 font-mono whitespace-pre-wrap">
+                                {toolOutput.error || toolOutput.output || '(No output)'}
+                              </pre>
+                            </div>
+                          )}
                       </div>
                   </div>
               </div>

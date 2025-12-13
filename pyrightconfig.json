@@ -1,0 +1,23 @@
+{
+  "include": [
+    "backend",
+    "AgentQMS"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/.venv",
+    "**/venv"
+  ],
+  "venvPath": "/home/vscode/.pyenv/versions/3.11.14",
+  "pythonVersion": "3.11",
+  "typeCheckingMode": "off",
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "reportUnusedImport": false,
+  "reportUnusedClass": false,
+  "reportUnusedFunction": false,
+  "reportUnusedVariable": false,
+  "pythonPlatform": "Linux"
+}
+

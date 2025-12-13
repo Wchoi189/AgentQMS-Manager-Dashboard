@@ -23,11 +23,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+# Add project root to path before importing AgentQMS modules
+_project_root = Path(__file__).resolve().parent.parent.parent.parent
+if str(_project_root) not in sys.path:
+    sys.path.insert(0, str(_project_root))
+
 import yaml
+
+from AgentQMS.agent_tools.utils.runtime import ensure_project_root_on_sys_path
+
+ensure_project_root_on_sys_path()
 
 # Try to import context bundle functions for validation
 try:
-    from agent_tools.core.context_bundle import (
+    from AgentQMS.agent_tools.core.context_bundle import (
         is_fresh,
         list_available_bundles,
         load_bundle_definition,
@@ -40,15 +49,11 @@ except ImportError:
 
 # Try to import plugin registry for extensibility
 try:
-    from agent_tools.core.plugins import get_plugin_registry
+    from AgentQMS.agent_tools.core.plugins import get_plugin_registry
 
     PLUGINS_AVAILABLE = True
 except ImportError:
     PLUGINS_AVAILABLE = False
-
-from AgentQMS.agent_tools.utils.runtime import ensure_project_root_on_sys_path
-
-ensure_project_root_on_sys_path()
 
 from AgentQMS.agent_tools.compliance.validate_boundaries import BoundaryValidator  # noqa: E402
 from AgentQMS.agent_tools.utils.paths import ensure_within_project, get_project_root
@@ -141,9 +146,27 @@ class ArtifactValidator:
     def __init__(self, artifacts_root: str | Path | None = None, strict_mode: bool = True):
         # Default to the configured artifacts directory if none is provided
         if artifacts_root is None:
-            from agent_tools.utils.paths import get_artifacts_dir
+            from AgentQMS.agent_tools.utils.paths import get_artifacts_dir
+            import os
 
-            self.artifacts_root = get_artifacts_dir().resolve()
+            # Try the configured path first
+            configured_path = get_artifacts_dir().resolve()
+            
+            # Auto-detect: if configured path doesn't exist, try alternatives
+            if not configured_path.exists():
+                project_root = get_project_root()
+                # Try demo_data/artifacts
+                demo_path = project_root / "demo_data" / "artifacts"
+                if demo_path.exists():
+                    self.artifacts_root = demo_path.resolve()
+                # Try docs/artifacts
+                elif (project_root / "docs" / "artifacts").exists():
+                    self.artifacts_root = (project_root / "docs" / "artifacts").resolve()
+                else:
+                    # Use configured path even if it doesn't exist (will fail later with better error)
+                    self.artifacts_root = configured_path
+            else:
+                self.artifacts_root = configured_path
         else:
             artifacts_root_path = Path(artifacts_root)
             if not artifacts_root_path.is_absolute():
@@ -215,7 +238,7 @@ class ArtifactValidator:
     def _load_excluded_directories(self) -> list[str]:
         """Load excluded directories from settings.yaml."""
         try:
-            from agent_tools.utils.config import load_config
+            from AgentQMS.agent_tools.utils.config import load_config
 
             config = load_config()
             return config.get("validation", {}).get("excluded_directories", ["archive", "deprecated"])
@@ -481,26 +504,34 @@ class ArtifactValidator:
         """Ensure artifacts are in docs/artifacts/ not root /artifacts/."""
         try:
             # Get the path relative to project root
-            from agent_tools.utils.paths import get_project_root
+            from AgentQMS.agent_tools.utils.paths import get_project_root
             project_root = get_project_root()
             relative_path = file_path.relative_to(project_root)
             path_str = str(relative_path).replace("\\", "/")
 
-            # Check if file starts with artifacts/ (without docs/ prefix)
-            if path_str.startswith("artifacts/") and not path_str.startswith("docs/artifacts/"):
+            # Check if file starts with artifacts/ (without docs/ or demo_data/ prefix)
+            if path_str.startswith("artifacts/") and not any(path_str.startswith(prefix) for prefix in ["docs/artifacts/", "demo_data/artifacts/"]):
                 return (
                     False,
-                    f"Artifacts must be in 'docs/artifacts/' not root 'artifacts/'. "
+                    f"Artifacts must be in 'docs/artifacts/' or 'demo_data/artifacts/' not root 'artifacts/'. "
                     f"Move file from '{path_str}' to 'docs/{path_str}'",
                 )
 
-            # Verify file is in docs/artifacts/ hierarchy
-            if not path_str.startswith("docs/artifacts/") and not path_str.startswith("AgentQMS/"):
-                return (
-                    False,
-                    f"Artifacts must be in 'docs/artifacts/' directory. "
-                    f"Current location: '{path_str}'",
-                )
+            # Verify file is in a valid artifacts hierarchy (docs/artifacts/ or demo_data/artifacts/)
+            valid_prefixes = ["docs/artifacts/", "demo_data/artifacts/", "AgentQMS/"]
+            if not any(path_str.startswith(prefix) for prefix in valid_prefixes):
+                # Also check if the file is within the configured artifacts_root
+                try:
+                    file_path.relative_to(self.artifacts_root)
+                    # File is within the configured artifacts root, which is valid
+                    return True, "Valid artifacts directory location"
+                except ValueError:
+                    # File is not within the configured artifacts root
+                    return (
+                        False,
+                        f"Artifacts must be in 'docs/artifacts/' or 'demo_data/artifacts/' directory. "
+                        f"Current location: '{path_str}'",
+                    )
 
         except ValueError:
             # File is outside project root - allow it (might be in AgentQMS module)
@@ -797,7 +828,7 @@ class ArtifactValidator:
 
         try:
             # Get project root using utility function
-            from agent_tools.utils.paths import get_project_root
+            from AgentQMS.agent_tools.utils.paths import get_project_root
             project_root = get_project_root()
 
             available_bundles = list_available_bundles()

@@ -11,6 +11,12 @@
 
 AgentQMS Dashboard provides a modern web interface for managing documentation artifacts, running compliance checks, and monitoring the quality management framework. Built with React + TypeScript (frontend) and FastAPI (backend).
 
+## 🚀 Live Demo
+
+**Deployed on Google Cloud Run**: [https://agentqms-dashboard-478428819978.us-central1.run.app](https://agentqms-dashboard-478428819978.us-central1.run.app)
+
+The dashboard is live and ready to use! Access it directly from your browser.
+
 ### Key Features
 
 - **🎯 Artifact Generator**: AI-powered creation of implementation plans, assessments, audits, and bug reports

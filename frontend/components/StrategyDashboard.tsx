@@ -31,12 +31,17 @@ const StrategyDashboard: React.FC = () => {
                 const response = await fetch('/api/v1/compliance/metrics');
                 if (response.ok) {
                     const data = await response.json();
+                    console.log('Compliance metrics received:', data);
                     setMetrics([
                         { name: 'Schema Compliance', current: data.schema_compliance || 0, target: 100 },
                         { name: 'Branch Integration', current: data.branch_integration || 0, target: 100 },
                         { name: 'Timestamp Accuracy', current: data.timestamp_accuracy || 0, target: 100 },
                         { name: 'Index Coverage', current: data.index_coverage || 0, target: 100 },
                     ]);
+                } else {
+                    console.error('Failed to fetch compliance metrics:', response.status, response.statusText);
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
                 }
             } catch (error) {
                 console.error('Failed to fetch compliance metrics:', error);

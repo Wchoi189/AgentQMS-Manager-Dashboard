@@ -20,8 +20,20 @@ _project_root = os.path.dirname(_backend_dir)  # project root/
 def get_artifacts_root():
     """Get artifacts root directory based on current DEMO_MODE setting."""
     demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+    
+    # Try the configured path first
     artifacts_rel = "demo_data/artifacts" if demo_mode else "docs/artifacts"
-    return os.path.join(_project_root, artifacts_rel)
+    artifacts_root = os.path.join(_project_root, artifacts_rel)
+    
+    # Auto-detect: if configured path doesn't exist, try the alternative
+    if not os.path.exists(artifacts_root):
+        alt_artifacts_rel = "docs/artifacts" if demo_mode else "demo_data/artifacts"
+        alt_artifacts_root = os.path.join(_project_root, alt_artifacts_rel)
+        if os.path.exists(alt_artifacts_root):
+            print(f"INFO: DEMO_MODE={demo_mode} but using alternative path: {alt_artifacts_root}")
+            return alt_artifacts_root
+    
+    return artifacts_root
 
 # Default ARTIFACTS_ROOT (can be overridden per request)
 ARTIFACTS_ROOT = get_artifacts_root()
@@ -108,9 +120,18 @@ async def list_artifacts(
     # Debug logging
     if not os.path.exists(artifacts_root):
         demo_mode = os.getenv("DEMO_MODE", "false").lower() == "true"
+        demo_mode_env = os.getenv("DEMO_MODE", "not set")
         print(f"WARNING: Artifacts root does not exist: {artifacts_root}")
-        print(f"DEMO_MODE: {demo_mode}")
-        return {"items": [], "total": 0}
+        print(f"DEMO_MODE env var: '{demo_mode_env}' (interpreted as: {demo_mode})")
+        print(f"Expected path: {'demo_data/artifacts' if demo_mode else 'docs/artifacts'}")
+        
+        # Try the alternative path
+        alt_artifacts_root = os.path.join(_project_root, "demo_data/artifacts" if not demo_mode else "docs/artifacts")
+        if os.path.exists(alt_artifacts_root):
+            print(f"INFO: Found artifacts at alternative path: {alt_artifacts_root}")
+            artifacts_root = alt_artifacts_root
+        else:
+            return {"items": [], "total": 0}
 
     # Determine directories to search
     subdirs = [ARTIFACT_TYPES[type]] if type and type in ARTIFACT_TYPES else ARTIFACT_TYPES.values()
