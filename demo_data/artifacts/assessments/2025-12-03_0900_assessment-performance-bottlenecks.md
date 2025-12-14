@@ -1,10 +1,14 @@
 ---
-title: "Assessment: Performance Bottleneck Analysis"
-type: assessment
-status: active
-created: 2025-12-03 09:00 (KST)
 category: performance
-tags: [assessment, performance, optimization]
+created: 2025-12-03 09:00 (KST)
+date: 2025-12-15 01:56 (KST)
+status: active
+tags:
+- assessment
+- performance
+- optimization
+title: 'Assessment: Performance Bottleneck Analysis'
+type: assessment
 ---
 
 # Assessment: Performance Bottleneck Analysis
