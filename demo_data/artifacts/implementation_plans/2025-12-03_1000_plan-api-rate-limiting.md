@@ -1,11 +1,15 @@
 ---
-title: "Implementation Plan: API Rate Limiting"
-type: implementation_plan
-status: draft
 created: 2025-12-03 10:00 (KST)
+date: 2025-12-15 01:55 (KST)
 phase: 1
 priority: medium
-tags: [api, rate-limiting, security]
+status: draft
+tags:
+- api
+- rate-limiting
+- security
+title: 'Implementation Plan: API Rate Limiting'
+type: implementation_plan
 ---
 
 # Implementation Plan: API Rate Limiting
