@@ -17,9 +17,17 @@ export interface SystemStats {
 
 export const getRegistry = async (): Promise<DocEntry[]> => {
   try {
-    const rawData = await bridgeService.getRegistry();
-    // Assuming backend returns { artifacts: [...] } or just an array
-    return rawData.artifacts || [];
+    const response = await bridgeService.getRegistry();
+    // Backend returns { items: ArtifactResponse[], total: number }
+    const items = response.items || [];
+
+    return items.map((item: any) => ({
+      path: item.path,
+      udi: item.id, // Use ID as UDI for now
+      title: item.title,
+      lastModified: item.created_at || new Date().toISOString(),
+      contentSnippet: "" // List view doesn't provide content
+    }));
   } catch (e) {
     console.warn("Bridge unconnected. Returning empty registry.", e);
     return [];
@@ -42,19 +50,21 @@ export const generateUDI = (): string => {
 };
 
 export const getSystemStats = async (): Promise<SystemStats> => {
-  const docs = await getRegistry();
-  
-  return {
-    totalDocs: docs.length,
-    docGrowth: 0,
-    referenceHealth: 100, // Placeholder for future logic
-    brokenLinks: 0,
-    pendingMigrations: 0,
-    distribution: [
-      { name: 'Docs', valid: docs.length, issues: 0 },
-      { name: 'Links', valid: 0, issues: 0 },
-    ]
-  };
+  try {
+    const stats = await bridgeService.getSystemStats();
+    return stats;
+  } catch (error) {
+    console.warn("Failed to fetch system stats, using fallback", error);
+    // Fallback if backend offline
+    return {
+      totalDocs: 0,
+      docGrowth: 0,
+      referenceHealth: 0,
+      brokenLinks: 0,
+      pendingMigrations: 0,
+      distribution: []
+    };
+  }
 };
 
 export const commitMigration = async (filePath: string, content: string): Promise<{ success: boolean; message: string }> => {

@@ -65,7 +65,13 @@ def check_links(directory: str) -> tuple[bool, list[str]]:
             return True, [f"Error during link validation: {str(e)}"]
     else:
         # Basic implementation
-        md_files = list(dir_path.rglob('*.md'))
+        md_files = []
+        for path in dir_path.rglob('*.md'):
+            # Manual exclusion for common ignored directories
+            if any(part in ['node_modules', '.git', 'dist', 'build', '__pycache__'] for part in path.parts):
+                continue
+            md_files.append(path)
+            
         if not md_files:
             return False, ["No markdown files found"]
         

@@ -1,0 +1,34 @@
+# Gold Standard Compliance Rules
+version: "1.0"
+
+common:
+  required_fields:
+    - type
+    - title
+    - status
+  
+artifact_types:
+  implementation_plan:
+    required_fields:
+      - category
+      - tags
+      - date
+    allowed_statuses:
+      - draft
+      - review_needed
+      - approved
+      - completed
+      - obsolete
+
+  assessment:
+    required_fields:
+      - category
+      - date
+    allowed_statuses:
+      - review_needed
+      - approved
+      - archived
+  
+  roadmap:
+    required_fields:
+      - last_updated

@@ -32,6 +32,20 @@ const ArtifactGenerator: React.FC = () => {
 
   useEffect(() => {
     setTimestamp(generateTimestamp());
+
+    // Fetch current git branch
+    const fetchBranch = async () => {
+      try {
+        const res = await fetch('/api/v1/git-branch');
+        if (res.ok) {
+          const data = await res.json();
+          setFormData(prev => ({ ...prev, branchName: data.branch }));
+        }
+      } catch (e) {
+        console.error("Failed to fetch branch:", e);
+      }
+    };
+    fetchBranch();
   }, []);
 
   useEffect(() => {
@@ -70,32 +84,32 @@ version: 1.0.0
   };
 
   const mapTypeToApi = (type: string): 'implementation_plan' | 'assessment' | 'audit' | 'bug_report' => {
-      switch(type) {
-          case 'ImplementationPlan': return 'implementation_plan';
-          case 'BugReport': return 'bug_report';
-          case 'Audit': return 'audit';
-          default: return 'assessment';
-      }
+    switch (type) {
+      case 'ImplementationPlan': return 'implementation_plan';
+      case 'BugReport': return 'bug_report';
+      case 'Audit': return 'audit';
+      default: return 'assessment';
+    }
   }
 
   const handleSave = async () => {
     if (!formData.title) {
-        alert("Title is required");
-        return;
+      alert("Title is required");
+      return;
     }
     setIsSaving(true);
     try {
-        await bridgeService.createArtifact({
-            type: mapTypeToApi(formData.type),
-            title: formData.title,
-            content: generatedOutput
-        });
-        alert("Artifact saved successfully!");
+      await bridgeService.createArtifact({
+        type: mapTypeToApi(formData.type),
+        title: formData.title,
+        content: generatedOutput
+      });
+      alert("Artifact saved successfully!");
     } catch (error) {
-        console.error("Failed to save artifact:", error);
-        alert(`Failed to save: ${error instanceof Error ? error.message : String(error)}`);
+      console.error("Failed to save artifact:", error);
+      alert(`Failed to save: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
-        setIsSaving(false);
+      setIsSaving(false);
     }
   };
 
@@ -179,24 +193,24 @@ version: 1.0.0
           </div>
 
           <div className="mb-4">
-             <label className="block text-sm font-medium text-blue-400 mb-1 flex items-center gap-2">
+            <label className="block text-sm font-medium text-blue-400 mb-1 flex items-center gap-2">
               Timestamp (Auto-generated)
               <span className="text-xs text-slate-500 bg-slate-900 px-2 py-0.5 rounded">Format Enforced</span>
             </label>
-             <div className="flex gap-2">
-                <input
-                  disabled
-                  value={timestamp}
-                  className="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-2 text-slate-400 cursor-not-allowed"
-                />
-                <button
-                  onClick={() => setTimestamp(generateTimestamp())}
-                  className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded flex items-center justify-center transition-colors"
-                  title="Update Timestamp"
-                >
-                  <RefreshCw size={18} />
-                </button>
-             </div>
+            <div className="flex gap-2">
+              <input
+                disabled
+                value={timestamp}
+                className="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-2 text-slate-400 cursor-not-allowed"
+              />
+              <button
+                onClick={() => setTimestamp(generateTimestamp())}
+                className="bg-slate-700 hover:bg-slate-600 text-white px-3 rounded flex items-center justify-center transition-colors"
+                title="Update Timestamp"
+              >
+                <RefreshCw size={18} />
+              </button>
+            </div>
           </div>
 
           <div className="mb-4">
@@ -209,7 +223,7 @@ version: 1.0.0
               placeholder="Brief summary of the artifact..."
             />
           </div>
-           <div className="mb-4">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-slate-300 mb-1">Tags</label>
             <input
               name="tags"
@@ -223,36 +237,35 @@ version: 1.0.0
 
         {/* Preview */}
         <div className="flex flex-col h-full">
-            <div className="bg-slate-950 rounded-t-xl border-t border-x border-slate-700 p-3 flex justify-between items-center">
-                <div className="flex items-center gap-2 text-slate-300">
-                    <FileText size={16} />
-                    <span className="text-sm font-mono">preview.md</span>
-                </div>
-                <div className="flex gap-2">
-                    <button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded transition-colors ${
-                            isSaving ? 'bg-green-800 text-slate-400' : 'bg-green-600 hover:bg-green-500 text-white'
-                        }`}
-                    >
-                        {isSaving ? <RefreshCw size={14} className="animate-spin"/> : <Save size={14} />}
-                        {isSaving ? 'Saving...' : 'Save to Disk'}
-                    </button>
-                    <button
-                        onClick={copyToClipboard}
-                        className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition-colors"
-                    >
-                        <Copy size={14} />
-                        Copy Code
-                    </button>
-                </div>
+          <div className="bg-slate-950 rounded-t-xl border-t border-x border-slate-700 p-3 flex justify-between items-center">
+            <div className="flex items-center gap-2 text-slate-300">
+              <FileText size={16} />
+              <span className="text-sm font-mono">preview.md</span>
             </div>
-            <div className="flex-1 bg-slate-950 border-x border-b border-slate-700 rounded-b-xl p-4 overflow-auto">
-                <pre className="font-mono text-sm text-green-400 whitespace-pre-wrap">
-                    {generatedOutput}
-                </pre>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded transition-colors ${isSaving ? 'bg-green-800 text-slate-400' : 'bg-green-600 hover:bg-green-500 text-white'
+                  }`}
+              >
+                {isSaving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}
+                {isSaving ? 'Saving...' : 'Save to Disk'}
+              </button>
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center gap-2 text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded transition-colors"
+              >
+                <Copy size={14} />
+                Copy Code
+              </button>
             </div>
+          </div>
+          <div className="flex-1 bg-slate-950 border-x border-b border-slate-700 rounded-b-xl p-4 overflow-auto">
+            <pre className="font-mono text-sm text-green-400 whitespace-pre-wrap">
+              {generatedOutput}
+            </pre>
+          </div>
         </div>
       </div>
     </div>

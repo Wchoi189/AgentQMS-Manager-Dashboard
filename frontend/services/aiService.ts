@@ -53,10 +53,10 @@ export const generateContent = async (prompt: string, config: AIRequestConfig = 
 
   // 2. OpenAI / OpenRouter Strategy (Fetch-based)
   if (settings.provider === AIProvider.OPENAI || settings.provider === AIProvider.OPENROUTER) {
-    const baseUrl = settings.provider === AIProvider.OPENROUTER 
-      ? "https://openrouter.ai/api/v1" 
+    const baseUrl = settings.provider === AIProvider.OPENROUTER
+      ? "https://openrouter.ai/api/v1"
       : (settings.baseUrl || "https://api.openai.com/v1");
-    
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${settings.apiKey}`
@@ -98,34 +98,46 @@ export const generateContent = async (prompt: string, config: AIRequestConfig = 
 };
 
 export const auditDocumentation = async (content: string, type: string): Promise<AuditResponse> => {
-  const systemInstruction = `
+  let systemInstruction = `
     You are AgentQMS, a Documentation Organization Efficiency Auditor.
     Your goal is to assess the organizational efficiency, consistency, and maintainability of documentation.
-    
-    Focus your assessment on:
-    1. Organizational Efficiency: How well is the documentation structured? Are architectural documents separated from session notes?
-    2. Consistency: Are naming conventions followed consistently? Is the structure predictable?
-    3. Entry Points: Can users easily find what they need? Is navigation clear?
-    4. Maintainability: Are there pain points that make maintenance difficult? Is there clutter?
-    5. Opportunities: What specific improvements would enhance organization?
-    
-    DO NOT focus on frontmatter validation (that's handled by tools). Instead, assess:
-    - How consistently conventions are followed
-    - Whether architectural documents are separated from session notes
-    - Clarity of entry points and navigation
-    - Pain points in maintainability
-    - Opportunities for organizational improvements
-    
     Return a structured JSON assessment with keys: score (number 0-100), issues (string array), recommendations (string array), rawAnalysis (string).
-    Score should reflect organizational efficiency (higher = better organized).
   `;
 
-  const prompt = `Assess the organizational efficiency of this ${type} documentation:\n\n${content}\n\nProvide an organizational assessment focusing on structure, consistency, maintainability, and opportunities for improvement.`;
-  
+  let prompt = `Assess the organizational efficiency of this ${type} documentation:\n\n${content}\n\nProvide an organizational assessment focusing on structure, consistency, maintainability, and opportunities for improvement.`;
+
+  // Tailored Prompts based on Type
+  switch (type) {
+    case 'File Reorganization':
+      systemInstruction = `You are a File Organization Specialist. Analyze the provided file list or content. Suggest relocations and renaming to organize loose artifacts. Output JSON.`;
+      prompt = `Analyze the following files/content for reorganization opportunities:\n\n${content}\n\nSuggest file relocations and renaming to improve organization.`;
+      break;
+    case 'Folder Reorganization':
+      systemInstruction = `You are a System Architect specializing in directory structures. Analyze the provided structure. Suggest a redesign to improve architecture. Output JSON.`;
+      prompt = `Analyze the current folder structure:\n\n${content}\n\nSuggest a redesign to improve architecture, reduce disorganization, and align with AgentQMS standards.`;
+      break;
+    case 'General Audit':
+      systemInstruction = `You are a Legacy Content Auditor. Identify deprecated, outdated, or redundant content. Output JSON.`;
+      prompt = `Audit the following content for deprecation or removal:\n\n${content}\n\nIdentify outdated contents and flag for removal based on project architecture context.`;
+      break;
+    case 'Coding Standards':
+      systemInstruction = `You are a Code Quality Reviewer. Check for adherence to design principles, script length, and data contracts. Output JSON.`;
+      prompt = `Review the following code/content for standards adherence:\n\n${content}\n\nCheck for design principle violations, script length issues, and usage of data contracts.`;
+      break;
+    case 'Documentation Quality':
+      systemInstruction = `You are a Technical Editor. Assess standardization, length, and lifecycle. Output JSON.`;
+      prompt = `Evaluate the quality of this documentation:\n\n${content}\n\nAssess standardization, appropriate length, and lifecycle management indicators.`;
+      break;
+    case 'Automation Usage':
+      systemInstruction = `You are a DevOps Engineer. Identify automation opportunities and maintenance pain points. Output JSON.`;
+      prompt = `Analyze the following for automation opportunities:\n\n${content}\n\nIdentify maintenance pain points and suggest automation strategies.`;
+      break;
+  }
+
   try {
-    const jsonStr = await generateContent(prompt, { 
-      systemInstruction, 
-      jsonMode: true 
+    const jsonStr = await generateContent(prompt, {
+      systemInstruction,
+      jsonMode: true
     });
     return JSON.parse(jsonStr) as AuditResponse;
   } catch (error) {
@@ -147,12 +159,12 @@ interface DirectoryTree {
 }
 
 export const generateArchitectureAdvice = async (
-  topic: string, 
+  topic: string,
   directoryStructure?: DirectoryTree
 ): Promise<string> => {
   try {
     let prompt = `Based on the actual directory structure shown below, provide recommendations for improving documentation organization for: ${topic}.\n\n`;
-    
+
     if (directoryStructure) {
       // Format directory tree as text
       const formatTree = (node: DirectoryTree, indent: string = ""): string => {
@@ -162,7 +174,7 @@ export const generateArchitectureAdvice = async (
         }
         return result;
       };
-      
+
       prompt += `Current Directory Structure:\n${formatTree(directoryStructure)}\n\n`;
       prompt += `Focus your advice on:\n`;
       prompt += `- How to improve documentation organization and maintainability\n`;
@@ -175,7 +187,7 @@ export const generateArchitectureAdvice = async (
     } else {
       prompt += `Provide 3 strategic bullet points for implementing ${topic} in a documentation quality management framework (AgentQMS). Focus on documentation organization, not generic scalability.`;
     }
-    
+
     return await generateContent(prompt, {
       systemInstruction: "You are a Senior Documentation Architect specializing in organizing technical documentation, maintaining consistency, and improving maintainability. Provide specific, actionable advice based on actual directory structures."
     });
@@ -196,7 +208,7 @@ export const generateAgentSystemPrompt = async (projectContext: string): Promise
       4. "Folder Structure Awareness": Explicitly state that tools and scripts are located in '${APP_CONFIG.PATHS.TOOLS}/' and artifacts in '${APP_CONFIG.PATHS.MODULES}/<project>/'.
       
       Output the result as a raw, copy-pasteable Markdown block.`;
-      
+
     return await generateContent(prompt, {
       systemInstruction: "You are a Meta-Prompt Engineer. You create system instructions for other AI models."
     });

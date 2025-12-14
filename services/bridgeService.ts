@@ -95,11 +95,19 @@ export const bridgeService = {
       body: JSON.stringify({ tool_id, args }),
     });
   },
-  
+
   /**
-   * Get the Registry Index.
+   * Get the Registry Index (Artifacts).
    */
-  getRegistry: async (): Promise<any> => {
-      return fetchJson<any>('/registry/index');
+  getRegistry: async (type?: string): Promise<any> => {
+    const query = type ? `?type=${type}` : '';
+    return fetchJson<any>(`/v1/artifacts${query}`);
+  },
+
+  /**
+   * Get System Statistics.
+   */
+  getSystemStats: async (): Promise<any> => {
+    return fetchJson<any>('/v1/stats');
   }
 };

@@ -78,7 +78,7 @@ export interface AuditToolConfig {
   description: string;
   command: string;
   scriptPath: string;
-  args: { name: string; flag: string; type: 'file' | 'text' | 'select'; options?: string[] }[];
+  args: { name: string; flag: string; type: 'file' | 'text' | 'select'; options?: string[]; placeholder?: string }[];
 }
 
 // Phase 2: Reference System Types

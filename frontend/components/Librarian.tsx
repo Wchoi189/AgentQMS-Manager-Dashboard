@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, Filter, Search, Eye, Calendar, Tag, FileText, Loader2 } from 'lucide-react';
 import { bridgeService, Artifact } from '../services/bridgeService';
 
+import ArtifactViewer from './ArtifactViewer';
+
 export const Librarian: React.FC = () => {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -9,6 +11,7 @@ export const Librarian: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewingArtifactId, setViewingArtifactId] = useState<string | null>(null);
 
   useEffect(() => {
     loadArtifacts();
@@ -61,8 +64,20 @@ export const Librarian: React.FC = () => {
     return colors[status] || 'bg-gray-100 text-gray-600';
   };
 
+  if (viewingArtifactId) {
+    return (
+      <ArtifactViewer
+        artifactId={viewingArtifactId}
+        onBack={() => {
+          setViewingArtifactId(null);
+          loadArtifacts(); // Reload list on back to reflect any changes
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col min-h-0">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
           <BookOpen size={28} />
@@ -175,7 +190,7 @@ export const Librarian: React.FC = () => {
                     )}
                   </div>
                   <button
-                    onClick={() => window.open(`/api/v1/artifacts/${artifact.id}`, '_blank')}
+                    onClick={() => setViewingArtifactId(artifact.id)}
                     className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center gap-2 text-sm transition-colors"
                   >
                     <Eye size={16} />

@@ -191,17 +191,28 @@ restart-backend: stop-backend
 
 stop-servers:
 	@echo "$(YELLOW)Stopping all servers...$(NC)"
-	@pkill -f "npm run dev" && echo "$(GREEN)✓ Frontend stopped$(NC)" || echo "$(YELLOW)Frontend not running$(NC)"
-	@pkill -f "python server.py" && echo "$(GREEN)✓ Backend stopped$(NC)" || echo "$(YELLOW)Backend not running$(NC)"
+	@make clean-ports
+	@echo "$(GREEN)✓ Servers stopped$(NC)"
 	@echo ""
 
 stop-frontend:
 	@echo "$(YELLOW)Stopping frontend...$(NC)"
-	@pkill -f "npm run dev" && echo "$(GREEN)✓ Frontend stopped$(NC)" || echo "$(YELLOW)Frontend not running$(NC)"
+	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@echo "$(GREEN)✓ Frontend stopped$(NC)"
 
 stop-backend:
 	@echo "$(YELLOW)Stopping backend...$(NC)"
-	@pkill -f "python server.py" && echo "$(GREEN)✓ Backend stopped$(NC)" || echo "$(YELLOW)Backend not running$(NC)"
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@echo "$(GREEN)✓ Backend stopped$(NC)"
+
+clean-ports:
+	@echo "$(YELLOW)Cleaning ports 3000 and 8000...$(NC)"
+	@lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@echo "$(GREEN)✓ Ports cleared$(NC)"
+
+force-stop: clean-ports
+	@echo "$(GREEN)✓ Force stop complete$(NC)"
 
 logs-frontend:
 	@echo "$(BLUE)Frontend logs (last 50 lines):$(NC)"

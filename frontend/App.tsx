@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { LayoutDashboard, FilePlus, ShieldAlert, Network, Menu, X, Settings as SettingsIcon, Cable, Telescope, BookOpen, Link2 } from 'lucide-react';
+import { LayoutDashboard, FilePlus, ShieldAlert, Network, Menu, X, Settings as SettingsIcon, Cable, Telescope, BookOpen, Link2, ShieldCheck } from 'lucide-react';
 import ArtifactGenerator from './components/ArtifactGenerator';
 import FrameworkAuditor from './components/FrameworkAuditor';
 import StrategyDashboard from './components/StrategyDashboard';
@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { Librarian } from './components/Librarian';
 import { ReferenceManager } from './components/ReferenceManager';
 import { AppView } from './types';
+import ComplianceDashboard from './components/ComplianceDashboard';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>(AppView.DASHBOARD);
@@ -36,6 +37,8 @@ const App: React.FC = () => {
         return <ReferenceManager />;
       case AppView.SETTINGS:
         return <Settings />;
+      case AppView.COMPLIANCE:
+        return <ComplianceDashboard />;
       default:
         return <StrategyDashboard />;
     }
@@ -44,11 +47,10 @@ const App: React.FC = () => {
   const NavItem = ({ view, icon: Icon, label }: { view: AppView; icon: any; label: string }) => (
     <button
       onClick={() => setCurrentView(view)}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-        currentView === view
-          ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
-          : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
-      }`}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${currentView === view
+        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
+        : 'text-slate-400 hover:bg-slate-800 hover:text-slate-100'
+        }`}
     >
       <Icon size={20} />
       {isSidebarOpen && <span className="font-medium">{label}</span>}
@@ -59,9 +61,8 @@ const App: React.FC = () => {
     <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
       {/* Sidebar */}
       <div
-        className={`${
-          isSidebarOpen ? 'w-64' : 'w-20'
-        } bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 ease-in-out z-20`}
+        className={`${isSidebarOpen ? 'w-64' : 'w-20'
+          } bg-slate-900 border-r border-slate-800 flex flex-col transition-all duration-300 ease-in-out z-20`}
       >
         <div className="p-4 flex items-center justify-between border-b border-slate-800">
           {isSidebarOpen && (
@@ -81,30 +82,30 @@ const App: React.FC = () => {
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <NavItem view={AppView.DASHBOARD} icon={LayoutDashboard} label="Dashboard" />
           <NavItem view={AppView.INTEGRATION_HUB} icon={Cable} label="Integration" />
-          
+
           <div className="py-2">
-             <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Core Tools</div>
-             <NavItem view={AppView.ARTIFACT_GENERATOR} icon={FilePlus} label="Generator" />
-             <NavItem view={AppView.FRAMEWORK_AUDITOR} icon={ShieldAlert} label="Auditor" />
+            <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Core Tools</div>
+            <NavItem view={AppView.ARTIFACT_GENERATOR} icon={FilePlus} label="Generator" />
+            <NavItem view={AppView.FRAMEWORK_AUDITOR} icon={ShieldAlert} label="Auditor" />
+            <NavItem view={AppView.COMPLIANCE} icon={ShieldCheck} label="Compliance (DMS)" />
           </div>
 
           <div className="py-2">
-             <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Registry</div>
-             <NavItem view={AppView.LIBRARIAN} icon={BookOpen} label="Library" />
-             <NavItem view={AppView.REFERENCE_MANAGER} icon={Link2} label="Ref Manager" />
-             <NavItem view={AppView.CONTEXT_EXPLORER} icon={Telescope} label="Explorer" />
+            <div className={`px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ${!isSidebarOpen && 'hidden'}`}>Registry</div>
+            <NavItem view={AppView.LIBRARIAN} icon={BookOpen} label="Library" />
+            <NavItem view={AppView.REFERENCE_MANAGER} icon={Link2} label="Ref Manager" />
+            <NavItem view={AppView.CONTEXT_EXPLORER} icon={Telescope} label="Explorer" />
           </div>
-          
+
         </nav>
 
         <div className="p-4 border-t border-slate-800">
-          <button 
+          <button
             onClick={() => setCurrentView(AppView.SETTINGS)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                currentView === AppView.SETTINGS 
-                ? 'bg-blue-600 text-white' 
-                : 'text-slate-500 hover:text-slate-300'
-            }`}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${currentView === AppView.SETTINGS
+              ? 'bg-blue-600 text-white'
+              : 'text-slate-500 hover:text-slate-300'
+              }`}
           >
             <SettingsIcon size={20} />
             {isSidebarOpen && <span className="font-medium text-sm">Settings</span>}
@@ -116,31 +117,32 @@ const App: React.FC = () => {
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <header className="h-16 bg-slate-900/50 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-8">
-            <div className="flex items-center gap-4">
-               <h1 className="text-xl font-semibold text-white">
-                  {currentView === AppView.DASHBOARD && "Dashboard Overview"}
-                  {currentView === AppView.ARTIFACT_GENERATOR && "Artifact Generator"}
-                  {currentView === AppView.FRAMEWORK_AUDITOR && "Compliance Auditor"}
-                  {currentView === AppView.STRATEGY_MAP && "Strategic Architecture"}
-                  {currentView === AppView.INTEGRATION_HUB && "Integration Hub"}
-                  {currentView === AppView.CONTEXT_EXPLORER && "Context & Traceability"}
-                  {currentView === AppView.LIBRARIAN && "Library"}
-                  {currentView === AppView.REFERENCE_MANAGER && "Reference Migration"}
-                  {currentView === AppView.SETTINGS && "System Settings"}
-               </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold text-white">
+              {currentView === AppView.DASHBOARD && "Dashboard Overview"}
+              {currentView === AppView.ARTIFACT_GENERATOR && "Artifact Generator"}
+              {currentView === AppView.FRAMEWORK_AUDITOR && "Compliance Auditor"}
+              {currentView === AppView.STRATEGY_MAP && "Strategic Architecture"}
+              {currentView === AppView.INTEGRATION_HUB && "Integration Hub"}
+              {currentView === AppView.CONTEXT_EXPLORER && "Context & Traceability"}
+              {currentView === AppView.LIBRARIAN && "Library"}
+              {currentView === AppView.REFERENCE_MANAGER && "Reference Migration"}
+              {currentView === AppView.SETTINGS && "System Settings"}
+              {currentView === AppView.COMPLIANCE && "DMS Compliance Dashboard"}
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
+              <span className="text-xs font-medium text-blue-400">Environment: v2.5.0</span>
             </div>
-            <div className="flex items-center gap-4">
-                <div className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                    <span className="text-xs font-medium text-blue-400">Environment: v2.5.0</span>
-                </div>
-            </div>
+          </div>
         </header>
 
         {/* Viewport */}
         <div className="flex-1 overflow-hidden p-6 relative">
-             <ErrorBoundary key={currentView}>
-                {renderContent()}
-             </ErrorBoundary>
+          <ErrorBoundary key={currentView}>
+            {renderContent()}
+          </ErrorBoundary>
         </div>
       </main>
     </div>

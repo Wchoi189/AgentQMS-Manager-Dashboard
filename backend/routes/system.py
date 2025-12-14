@@ -64,6 +64,23 @@ async def get_demo_mode():
         "using_demo_data": "demo_data" in artifacts_root
     }
 
+@router.get("/git-branch")
+async def get_git_branch():
+    """Get the current git branch name."""
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=_project_root
+        )
+        return {"branch": result.stdout.strip()}
+    except Exception as e:
+        # Fallback if not a git repo or error
+        return {"branch": "main", "error": str(e)}
+
 @router.get("/stats", response_model=SystemStats)
 async def get_stats():
     """Get real system statistics from artifacts."""

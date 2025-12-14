@@ -87,6 +87,39 @@ Update `updated:` field when editing.
 - Success Criteria (measurable outcomes)
 - Key Doc References
 
+## Context Health & Session Handover
+
+**CRITICAL PROTOCOL**: To prevent hallucination and logic degradation, all Agents must respect context limits.
+
+### 1. Monitor Context Health
+*   **Step Count**: Be aware of the current Step ID.
+*   **Threshold**:
+    *   **~120 Steps**: Plan to wrap up current logical unit.
+    *   **~150 Steps**: **HARD STOP**. Initiate Session Handover immediately. do NOT start new complex tasks.
+
+### 2. Automatic Handover Procedure
+When the threshold is reached:
+1.  **Stop Execution**: Finish the immediate file edit or command, but do not start a new feature.
+2.  **Create Handover Artifact**:
+    *   Path: `demo_data/artifacts/handoffs/YYYY-MM-DD_handoff_session-[N].md`
+    *   Template: See `Session Handover` section above.
+3.  **Notify User**:
+    *   Explicitly state: "Context saturation approached (Step X). Initiating handover."
+    *   Provide the **Continuation Prompt** in a code block for easy copying.
+
+### 3. Continuation Prompt Format
+The prompt for the next agent MUST be self-contained:
+```markdown
+I am continuing the "[Project Name]" project.
+Previous Session ended at: [Phase/Task].
+Current Context: [Brief summary of what was just done].
+Immediate Task: [First step for new agent].
+Relevant Docs:
+- [Link to Roadmap]
+- [Link to Implementation Plan]
+- [Link to Handover Artifact]
+```
+
 ## Documentation Maintenance
 
 ### Weekly Audit Checklist
