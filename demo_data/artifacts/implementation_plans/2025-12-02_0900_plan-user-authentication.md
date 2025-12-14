@@ -1,11 +1,14 @@
 ---
-title: "Implementation Plan: User Authentication System"
-type: implementation_plan
-status: active
 created: 2025-12-02 09:00 (KST)
 phase: 1
 priority: high
-tags: [authentication, security, user-management]
+status: draft
+tags:
+- authentication
+- security
+- user-management
+title: 'Implementation Plan: User Authentication System'
+type: implementation_plan
 ---
 
 # Implementation Plan: User Authentication System
