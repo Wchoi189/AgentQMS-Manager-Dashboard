@@ -1,5 +1,6 @@
 ---
 author: AgentQMS
+category: uncategorized
 date: 2025-12-14 20:33 (KST)
 status: draft
 title: Markdown Feature Test
