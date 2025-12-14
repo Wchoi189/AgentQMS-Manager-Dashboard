@@ -4,7 +4,7 @@ created: 2025-12-01 10:00 (KST)
 date: 2025-12-14 23:30 (KST)
 phase: 2
 priority: high
-status: active
+status: draft
 tags:
 - ocr
 - feature
