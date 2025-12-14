@@ -1,11 +1,15 @@
 ---
-title: "Implementation Plan: OCR Feature Enhancement"
-type: implementation_plan
-status: active
 created: 2025-12-01 10:00 (KST)
+date: 2025-12-14 23:30 (KST)
 phase: 2
 priority: high
-tags: [ocr, feature, enhancement]
+status: active
+tags:
+- ocr
+- feature
+- enhancement
+title: 'Implementation Plan: OCR Feature Enhancement'
+type: implementation_plan
 ---
 
 # Implementation Plan: OCR Feature Enhancement
