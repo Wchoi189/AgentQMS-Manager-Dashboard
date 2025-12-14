@@ -1,11 +1,15 @@
 ---
-title: "Implementation Plan: Database Migration to PostgreSQL"
-type: implementation_plan
-status: completed
 created: 2025-12-02 14:00 (KST)
+date: 2025-12-15 01:57 (KST)
 phase: 3
 priority: medium
-tags: [database, migration, postgresql]
+status: completed
+tags:
+- database
+- migration
+- postgresql
+title: 'Implementation Plan: Database Migration to PostgreSQL'
+type: implementation_plan
 ---
 
 # Implementation Plan: Database Migration to PostgreSQL
