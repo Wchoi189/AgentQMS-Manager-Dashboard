@@ -1,4 +1,5 @@
 ---
+category: uncategorized
 created: 2025-12-02 09:00 (KST)
 date: 2025-12-15 01:57 (KST)
 phase: 1
