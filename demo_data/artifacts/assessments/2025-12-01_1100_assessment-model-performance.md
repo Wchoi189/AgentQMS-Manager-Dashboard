@@ -1,10 +1,13 @@
 ---
-title: "Assessment: Model Performance Analysis"
-type: assessment
-status: complete
-created: 2025-12-01 11:00 (KST)
 category: evaluation
-tags: [assessment, performance]
+created: 2025-12-01 11:00 (KST)
+date: 2025-12-15 00:06 (KST)
+status: complete
+tags:
+- assessment
+- performance
+title: 'Assessment: Model Performance Analysis'
+type: assessment
 ---
 
 # Assessment: Model Performance Analysis
