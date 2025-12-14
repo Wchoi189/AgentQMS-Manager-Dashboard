@@ -1,10 +1,13 @@
 ---
-title: "Assessment: Security Audit Results"
-type: assessment
-status: complete
-created: 2025-12-02 11:00 (KST)
 category: security
-tags: [assessment, security, audit]
+created: 2025-12-02 11:00 (KST)
+status: draft
+tags:
+- assessment
+- security
+- audit
+title: 'Assessment: Security Audit Results'
+type: assessment
 ---
 
 # Assessment: Security Audit Results
